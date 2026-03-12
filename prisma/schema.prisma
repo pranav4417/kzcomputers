@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  role      String   @default("agent")
+  status    String   @default("pending")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Agent assignments
+  tickets   Ticket[] @relation("AgentAssignment")
+
+  @@map("admins")
+}
+
+model Customer {
+  id            Int             @id @default(autoincrement())
+  name          String
+  email         String          @unique
+  phone         String
+  password      String
+  verified      Boolean         @default(false)
+  createdAt     DateTime        @default(now()) @map("created_at")
+  quoteRequests QuoteRequest[]
+
+  @@map("customers")
+}
+
+model Ticket {
+  id           Int      @id @default(autoincrement())
+  ticketNumber String   @unique @map("ticket_number")
+  product      String
+  serviceType  String   @map("service_type")
+  customerName String   @map("customer_name")
+  phone        String
+  email        String
+  subject      String
+  description  String?
+  image        String?
+  priority     String   @default("Low")
+  status       String   @default("Open")
+  comments     String?
+  ticketToken  String?  @unique @map("ticket_token")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Shopkeeper Additions
+  assignedToId Int?     @map("assigned_to_id")
+  assignedTo   Admin?   @relation("AgentAssignment", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  updates      TicketUpdate[]
+  invoices     Invoice[]
+
+  @@map("tickets")
+}
+
+model TicketUpdate {
+  id          Int      @id @default(autoincrement())
+  ticketId    Int      @map("ticket_id")
+  status      String
+  comment     String?
+  createdBy   String   // "Agent" or "System" or "Customer"
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  ticket      Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@map("ticket_updates")
+}
+
+model Invoice {
+  id           Int       @id @default(autoincrement())
+  invoiceNumber String   @unique @map("invoice_number")
+  ticketId     Int       @map("ticket_id")
+  amount       Float
+  status       String    @default("Unpaid")
+  pdfUrl       String?   @map("pdf_url")
+  items        String?   // JSON string for line items
+  generatedBy  String?   @map("generated_by")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  ticket       Ticket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@map("invoices")
+}
+
+model Product {
+  id            Int            @id @default(autoincrement())
+  name          String
+  description   String?
+  price         Decimal?
+  image         String?
+  createdAt     DateTime       @default(now()) @map("created_at")
+  quoteRequests QuoteRequest[]
+
+  @@map("products")
+}
+
+model QuoteRequest {
+  id          Int      @id @default(autoincrement())
+  customerId  Int?     @map("customer_id")
+  productId   Int      @map("product_id")
+  guestEmail  String?  @map("guest_email")
+  guestPhone  String?  @map("guest_phone")
+  message     String?
+  status      String   @default("Pending") // Pending, Reviewed, Sent
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  customer    Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("quote_requests")
+}
+
+model Service {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  image       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("services")
+}
+
+model Slider {
+  id        Int      @id @default(autoincrement())
+  image     String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("sliders")
+}
+
+model Appearance {
+  id             Int      @id @default(autoincrement())
+  primaryColor   String   @default("#6C63FF") @map("primary_color")
+  secondaryColor String   @default("#FF6584") @map("secondary_color")
+  fontFamily     String   @default("Inter, sans-serif") @map("font_family")
+  darkMode       Boolean  @default(true) @map("dark_mode")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("appearance")
+}
+
+model Otp {
+  id        Int      @id @default(autoincrement())
+  email     String
+  code      String
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("otps")
+}
+
+model PendingUpdate {
+  id          Int      @id @default(autoincrement())
+  entityType  String
+  entityId    Int?
+  data        String
+  submittedBy Int
+  status      String   @default("Pending")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("pending_updates")
+}
