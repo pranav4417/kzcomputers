@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import fs from 'fs/promises';
-import path from 'path';
+import { v2 as cloudinary } from 'cloudinary';
+
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 export async function DELETE(req, { params }) {
     try {
@@ -34,10 +40,22 @@ export async function PATCH(req, { params }) {
             const bytes = await image.arrayBuffer();
             const buffer = Buffer.from(bytes);
             const fileName = `${Date.now()}-${image.name}`;
-            const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'products');
-            await fs.mkdir(uploadDir, { recursive: true });
-            await fs.writeFile(path.join(uploadDir, fileName), buffer);
-            updateData.image = `/uploads/products/${fileName}`;
+
+            // Upload to Cloudinary
+            const uploadResult = await new Promise((resolve, reject) => {
+                cloudinary.uploader.upload_stream(
+                    {
+                        public_id: `products/${fileName.replace(/\.[^/.]+$/, '')}`,
+                        folder: 'suraksha/products'
+                    },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                ).end(buffer);
+            });
+
+            updateData.image = uploadResult.secure_url;
         }
 
         const product = await prisma.product.update({
