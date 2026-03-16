@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-    Shield, LayoutDashboard, Ticket, Package, Hammer, Palette, Users, LogOut, Menu, X
+    Shield, LayoutDashboard, Ticket, Package, Hammer, Palette, Users, LogOut, Menu, X, Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -22,6 +22,7 @@ export default function AdminLayout({ children }) {
         { name: 'Services', href: '/admin/services', icon: Hammer },
         { name: 'Appearance', href: '/admin/appearance', icon: Palette },
         { name: 'Agents', href: '/admin/agents', icon: Users },
+        { name: 'Data Export', href: '/admin/export', icon: Download },
     ];
 
     const handleLogout = async () => {
