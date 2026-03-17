@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth';
 
 export async function POST(req) {
     try {
@@ -9,6 +10,12 @@ export async function POST(req) {
         // Basic validation
         if (!customerName || !email || !productId) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
         }
 
         const quoteRequest = await prisma.quoteRequest.create({
@@ -31,13 +38,19 @@ export async function POST(req) {
 
 export async function GET(req) {
     try {
-        // Optionally, add admin-only checks here by getting the session.
+        // Require admin authentication to view all quotes
+        const session = await requireAuth(['admin', 'superadmin', 'agent']);
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 });
+        }
+
         const quotes = await prisma.quoteRequest.findMany({
             include: { product: true },
             orderBy: { createdAt: 'desc' }
         });
         return NextResponse.json(quotes);
     } catch (err) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        console.error("Quote fetch error:", err);
+        return NextResponse.json({ error: 'Failed to fetch quotes' }, { status: 500 });
     }
 }

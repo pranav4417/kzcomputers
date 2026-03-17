@@ -172,3 +172,53 @@ model PendingUpdate {
 
   @@map("pending_updates")
 }
+
+// Group Service Module - Parts and Charges
+model Part {
+  id          Int      @id @default(autoincrement())
+  name        String
+  partNumber  String?  @unique @map("part_number")
+  category    String   @default("General")
+  description String?
+  price       Float
+  costPrice   Float?   @map("cost_price")
+  hsnCode     String?  @map("hsn_code")
+  gstRate     Float    @default(18) @map("gst_rate")
+  stock       Int      @default(0)
+  minStock    Int      @default(0) @map("min_stock")
+  unit        String   @default("NOS") // NOS, KG, MTR, LTR, etc.
+  image       String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("parts")
+}
+
+model ServiceCharge {
+  id          Int      @id @default(autoincrement())
+  name        String
+  code        String?  @unique // Service code like "LAB-001", "VISIT-001"
+  category    String   @default("Labor") // Labor, Visit, Diagnostic, etc.
+  description String?
+  price       Float
+  gstRate     Float    @default(18) @map("gst_rate")
+  duration    Int?     // Duration in minutes
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("service_charges")
+}
+
+model ServiceGroup {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  displayOrder Int    @default(0) @map("display_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("service_groups")
+}

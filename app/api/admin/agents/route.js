@@ -1,9 +1,16 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { requireAuth } from '@/lib/auth';
 
 export async function GET() {
     try {
+        // Check authentication
+        const session = await requireAuth(['admin', 'superadmin']);
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const agents = await prisma.admin.findMany({
             select: {
                 id: true,
@@ -23,6 +30,12 @@ export async function GET() {
 
 export async function POST(req) {
     try {
+        // Check authentication
+        const session = await requireAuth(['admin', 'superadmin']);
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 });
+        }
+
         const { username, email, password, role } = await req.json();
 
         // Check if exists
@@ -60,6 +73,12 @@ export async function POST(req) {
 
 export async function DELETE(req) {
     try {
+        // Check authentication
+        const session = await requireAuth(['admin', 'superadmin']);
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 });
+        }
+
         const { searchParams } = new URL(req.url);
         const id = searchParams.get('id');
 
@@ -82,5 +101,30 @@ export async function DELETE(req) {
         return NextResponse.json({ success: true });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to delete agent' }, { status: 500 });
+    }
+}
+
+export async function PUT(req) {
+    try {
+        const session = await requireAuth(['superadmin']);
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized - Superadmin access required' }, { status: 401 });
+        }
+
+        const { id, status } = await req.json();
+
+        if (!id || !status) {
+            return NextResponse.json({ error: 'ID and status are required' }, { status: 400 });
+        }
+
+        const updated = await prisma.admin.update({
+            where: { id: parseInt(id) },
+            data: { status }
+        });
+
+        return NextResponse.json({ success: true, agent: updated });
+    } catch (error) {
+        console.error('Update agent error:', error);
+        return NextResponse.json({ error: 'Failed to update agent' }, { status: 500 });
     }
 }

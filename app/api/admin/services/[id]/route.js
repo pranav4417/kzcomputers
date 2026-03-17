@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth';
 import { v2 as cloudinary } from 'cloudinary';
 
 // Configure Cloudinary
@@ -11,7 +12,27 @@ cloudinary.config({
 
 export async function DELETE(req, { params }) {
     try {
+        // Check authentication
+        const session = await requireAuth(['admin', 'superadmin']);
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 });
+        }
+
         const { id } = await params;
+
+        if (session.role === 'admin') {
+            await prisma.pendingUpdate.create({
+                data: {
+                    entityType: 'Service_Delete',
+                    entityId: parseInt(id),
+                    data: '{}',
+                    submittedBy: session.id,
+                    status: 'Pending'
+                }
+            });
+            return NextResponse.json({ success: true, message: 'Service deletion submitted for superadmin approval' });
+        }
+
         await prisma.service.delete({ where: { id: parseInt(id) } });
         return NextResponse.json({ success: true });
     } catch (err) {
@@ -21,6 +42,12 @@ export async function DELETE(req, { params }) {
 
 export async function PATCH(req, { params }) {
     try {
+        // Check authentication
+        const session = await requireAuth(['admin', 'superadmin']);
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 });
+        }
+
         const { id } = await params;
         const formData = await req.formData();
 
@@ -54,6 +81,19 @@ export async function PATCH(req, { params }) {
             });
 
             updateData.image = uploadResult.secure_url;
+        }
+
+        if (session.role === 'admin') {
+            await prisma.pendingUpdate.create({
+                data: {
+                    entityType: 'Service_Update',
+                    entityId: parseInt(id),
+                    data: JSON.stringify(updateData),
+                    submittedBy: session.id,
+                    status: 'Pending'
+                }
+            });
+            return NextResponse.json({ success: true, message: 'Service update submitted for superadmin approval' });
         }
 
         const service = await prisma.service.update({

@@ -12,8 +12,22 @@ export default function AgentManagement() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [saving, setSaving] = useState(false);
     const [newAgent, setNewAgent] = useState({ username: '', email: '', password: '', role: 'agent' });
+    const [currentUser, setCurrentUser] = useState(null);
 
-    useEffect(() => { fetchAgents(); }, []);
+    useEffect(() => { 
+        fetchAgents(); 
+        fetchCurrentUser();
+    }, []);
+
+    const fetchCurrentUser = async () => {
+        try {
+            const res = await fetch('/api/auth/session-check');
+            const data = await res.json();
+            if (data.user) setCurrentUser(data.user);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const fetchAgents = async () => {
         setLoading(true);
@@ -52,6 +66,21 @@ export default function AgentManagement() {
             const res = await fetch(`/api/admin/agents?id=${id}`, { method: 'DELETE' });
             if (res.ok) fetchAgents();
             else alert(await res.json().then(data => data.error) || 'Failed to delete');
+        } catch (err) {
+            alert('Failed to execute');
+        }
+    };
+
+    const handleApproveAgent = async (id) => {
+        if (!confirm('Are you sure you want to approve this staff account?')) return;
+        try {
+            const res = await fetch('/api/admin/agents', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, status: 'active' })
+            });
+            if (res.ok) fetchAgents();
+            else alert(await res.json().then(data => data.error) || 'Failed to approve');
         } catch (err) {
             alert('Failed to execute');
         }
@@ -99,7 +128,20 @@ export default function AgentManagement() {
                                 {agent.status}
                             </div>
 
-                            {agent.role !== 'admin' && (
+                            {agent.status === 'pending' && currentUser?.role === 'superadmin' && (
+                                <button
+                                    onClick={() => handleApproveAgent(agent.id)}
+                                    className="md:opacity-0 md:group-hover:opacity-100"
+                                    title="Approve access"
+                                    style={{ position: 'absolute', top: '1rem', right: '3.5rem', transition: 'opacity 0.3s', padding: '0.5rem', color: '#4ade80', background: 'rgba(52, 199, 89, 0.1)', borderRadius: '0.5rem', cursor: 'pointer', border: 'none' }}
+                                    onMouseOver={e => e.currentTarget.style.background = 'rgba(52, 199, 89, 0.2)'}
+                                    onMouseOut={e => e.currentTarget.style.background = 'rgba(52, 199, 89, 0.1)'}
+                                >
+                                    <Shield size={16} />
+                                </button>
+                            )}
+
+                            {agent.role !== 'admin' && currentUser?.role === 'superadmin' && (
                                 <button
                                     onClick={() => handleDeleteAgent(agent.id)}
                                     className="md:opacity-0 md:group-hover:opacity-100"

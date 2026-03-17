@@ -4,16 +4,25 @@ import React, { useState } from 'react';
 import {
     Ticket, CheckCircle2, Clock, AlertCircle, ShoppingBag, TrendingUp, ArrowUpRight, Download
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import ExportModal from '@/components/ExportModal';
 
 export default function AdminOverviewClient({ stats, recentTickets }) {
     const [showExportModal, setShowExportModal] = useState(false);
+    const router = useRouter();
 
     const cards = [
         { name: 'Total Tickets', value: stats.totalTickets, icon: Ticket, color: 'var(--primary)' },
         { name: 'Open Queries', value: stats.openTickets, icon: Clock, color: '#ffc107' },
         { name: 'Fixed Today', value: stats.completedTickets, icon: CheckCircle2, color: '#28a745' },
         { name: 'Products Live', value: stats.totalProducts, icon: ShoppingBag, color: 'var(--secondary)' },
+    ];
+
+    // Use real service distribution data from stats
+    const serviceStats = stats.serviceStats || [
+        { name: 'Laptops', percentage: 65 },
+        { name: 'CCTV Installation', percentage: 20 },
+        { name: 'Custom PCs', percentage: 15 }
     ];
 
     return (
@@ -71,7 +80,11 @@ export default function AdminOverviewClient({ stats, recentTickets }) {
                     <div className="glass flex flex-col" style={{ gridColumn: '1 / -1', overflow: 'hidden' }}>
                         <div className="p-6 flex justify-between items-center" style={{ borderBottom: '1px solid var(--border-glass)' }}>
                             <h3 style={{ fontWeight: 'bold', margin: 0 }}>Recent Service Requests</h3>
-                            <button style={{ background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--primary)', cursor: 'pointer' }} className="hover-primary">
+                            <button
+                                onClick={() => router.push('/admin/tickets')}
+                                style={{ background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--primary)', cursor: 'pointer' }}
+                                className="hover-primary"
+                            >
                                 VIEW ALL <ArrowUpRight size={12} />
                             </button>
                         </div>
@@ -112,33 +125,17 @@ export default function AdminOverviewClient({ stats, recentTickets }) {
                     <div className="glass p-8 flex flex-col" style={{ gridColumn: '1 / -1' }}>
                         <h3 style={{ fontWeight: 'bold', marginBottom: '1.5rem', marginTop: 0 }}>Service Distribution</h3>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
-                            <div className="flex flex-col gap-2">
-                                <div className="flex justify-between" style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase' }}>
-                                    <span>Laptops</span>
-                                    <span>65%</span>
+                            {serviceStats.slice(0, 3).map((service, idx) => (
+                                <div key={service.name || idx} className="flex flex-col gap-2">
+                                    <div className="flex justify-between" style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase' }}>
+                                        <span>{service.name}</span>
+                                        <span>{service.percentage}%</span>
+                                    </div>
+                                    <div style={{ width: '100%', height: '0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '1rem', overflow: 'hidden' }}>
+                                        <div style={{ height: '100%', background: idx === 0 ? 'var(--primary)' : idx === 1 ? 'var(--secondary)' : '#ffc107', width: `${service.percentage}%` }} />
+                                    </div>
                                 </div>
-                                <div style={{ width: '100%', height: '0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '1rem', overflow: 'hidden' }}>
-                                    <div style={{ height: '100%', background: 'var(--primary)', width: '65%' }} />
-                                </div>
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <div className="flex justify-between" style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase' }}>
-                                    <span>CCTV Installation</span>
-                                    <span>20%</span>
-                                </div>
-                                <div style={{ width: '100%', height: '0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '1rem', overflow: 'hidden' }}>
-                                    <div style={{ height: '100%', background: 'var(--secondary)', width: '20%' }} />
-                                </div>
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <div className="flex justify-between" style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase' }}>
-                                    <span>Custom PCs</span>
-                                    <span>15%</span>
-                                </div>
-                                <div style={{ width: '100%', height: '0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '1rem', overflow: 'hidden' }}>
-                                    <div style={{ height: '100%', background: '#ffc107', width: '15%' }} />
-                                </div>
-                            </div>
+                            ))}
                         </div>
 
                         <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(108, 99, 255, 0.1)', borderRadius: '1rem', border: '1px solid rgba(108, 99, 255, 0.2)', textAlign: 'center' }}>

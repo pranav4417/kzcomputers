@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth';
 import { v2 as cloudinary } from 'cloudinary';
 
 // Configure Cloudinary
@@ -10,12 +11,23 @@ cloudinary.config({
 });
 
 export async function GET() {
-    const products = await prisma.product.findMany({ orderBy: { createdAt: 'desc' } });
-    return NextResponse.json(products);
+    // Public endpoint - anyone can view products
+    try {
+        const products = await prisma.product.findMany({ orderBy: { createdAt: 'desc' } });
+        return NextResponse.json(products);
+    } catch (error) {
+        return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
+    }
 }
 
 export async function POST(req) {
     try {
+        // Check authentication
+        const session = await requireAuth(['admin', 'superadmin']);
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 });
+        }
+
         const formData = await req.formData();
         const name = formData.get('name');
         const description = formData.get('description');
@@ -43,6 +55,18 @@ export async function POST(req) {
             });
 
             imagePath = uploadResult.secure_url;
+        }
+
+        if (session.role === 'admin') {
+            await prisma.pendingUpdate.create({
+                data: {
+                    entityType: 'Product_Create',
+                    data: JSON.stringify({ name, description, price: parseFloat(price), image: imagePath }),
+                    submittedBy: session.id,
+                    status: 'Pending'
+                }
+            });
+            return NextResponse.json({ success: true, message: 'Product creation submitted for superadmin approval' });
         }
 
         const product = await prisma.product.create({

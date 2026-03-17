@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth';
 import { v2 as cloudinary } from 'cloudinary';
 
 // Configure Cloudinary
@@ -10,12 +11,23 @@ cloudinary.config({
 });
 
 export async function GET() {
-    const services = await prisma.service.findMany({ orderBy: { createdAt: 'desc' } });
-    return NextResponse.json(services);
+    // Public endpoint - anyone can view services
+    try {
+        const services = await prisma.service.findMany({ orderBy: { createdAt: 'desc' } });
+        return NextResponse.json(services);
+    } catch (error) {
+        return NextResponse.json({ error: 'Failed to fetch services' }, { status: 500 });
+    }
 }
 
 export async function POST(req) {
     try {
+        // Check authentication
+        const session = await requireAuth(['admin', 'superadmin']);
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 });
+        }
+
         const formData = await req.formData();
         const name = formData.get('name');
         const description = formData.get('description');
@@ -42,6 +54,18 @@ export async function POST(req) {
             });
 
             imagePath = uploadResult.secure_url;
+        }
+
+        if (session.role === 'admin') {
+            await prisma.pendingUpdate.create({
+                data: {
+                    entityType: 'Service_Create',
+                    data: JSON.stringify({ name, description, image: imagePath }),
+                    submittedBy: session.id,
+                    status: 'Pending'
+                }
+            });
+            return NextResponse.json({ success: true, message: 'Service creation submitted for superadmin approval' });
         }
 
         const service = await prisma.service.create({

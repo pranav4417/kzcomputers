@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth';
 import { sendTicketEmail, sendInvoiceEmail } from '@/lib/email';
 import { generateInvoicePDFBuffer } from '@/lib/pdfGenerator';
 import fs from 'fs';
@@ -12,6 +13,12 @@ function getPublicDir() {
 
 export async function PATCH(req, { params }) {
     try {
+        // Check authentication
+        const session = await requireAuth(['admin', 'agent', 'superadmin']);
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 });
+        }
+
         const { id } = await params;
         const { status, comments, assignedToId, updatedByRole, invoiceItems, sendInvoiceEmail: shouldSendInvoice } = await req.json();
 
@@ -158,6 +165,12 @@ export async function PATCH(req, { params }) {
 
 export async function DELETE(req, { params }) {
     try {
+        // Check authentication
+        const session = await requireAuth(['admin', 'superadmin']);
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 });
+        }
+
         const { id } = await params;
 
         // Delete related records first (cascading)

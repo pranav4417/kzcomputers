@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth, getSession } from '@/lib/auth';
 import { generateInvoicePDFBuffer } from '@/lib/pdfGenerator';
 import { sendInvoiceEmail } from '@/lib/email';
 import fs from 'fs';
@@ -18,7 +18,7 @@ export async function POST(req) {
         const { ticketId, amount, status, items, sendEmail: shouldSendEmail } = body;
 
         const session = await getSession();
-        if (!session || (session.role !== 'admin' && session.role !== 'agent')) {
+        if (!session || !['admin', 'agent', 'superadmin'].includes(session.role)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -27,10 +27,23 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Ticket not found.' }, { status: 404 });
         }
 
-        // Generate an Invoice Number
+        // Generate a unique Invoice Number using timestamp to prevent duplicates
         const currentYear = new Date().getFullYear();
-        const count = await prisma.invoice.count();
-        const invoiceNumber = `EST-${currentYear}-${String(count + 1).padStart(4, '0')}`;
+        const timestamp = Date.now().toString(36).toUpperCase();
+        const invoiceNumber = `EST-${currentYear}-${timestamp}`;
+
+        if (session.role === 'admin' || session.role === 'agent') {
+            await prisma.pendingUpdate.create({
+                data: {
+                    entityType: 'Invoice_Create',
+                    entityId: parseInt(ticketId),
+                    data: JSON.stringify({ amount, status, items, sendEmail: shouldSendEmail }),
+                    submittedBy: session.id,
+                    status: 'Pending'
+                }
+            });
+            return NextResponse.json({ success: true, message: 'Invoice generation submitted for superadmin approval' });
+        }
 
         // Parse items
         let parsedItems = [];
@@ -129,6 +142,12 @@ export async function POST(req) {
 
 export async function GET(req) {
     try {
+        // Check authentication
+        const session = await requireAuth(['admin', 'agent', 'superadmin']);
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const { searchParams } = new URL(req.url);
         const ticketId = searchParams.get('ticketId');
 
