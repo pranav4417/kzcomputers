@@ -28,6 +28,11 @@ export async function PATCH(req, { params }) {
         if (comments !== undefined) updateData.comments = comments;
         if (assignedToId !== undefined) updateData.assignedToId = assignedToId === "" ? null : parseInt(assignedToId);
 
+        // Save invoice items to ticket if provided (for persisting costs/charges)
+        if (invoiceItems && invoiceItems.length > 0) {
+            updateData.items = JSON.stringify(invoiceItems);
+        }
+
         const ticket = await prisma.ticket.update({
             where: { id: parseInt(id) },
             data: updateData
@@ -81,23 +86,8 @@ export async function PATCH(req, { params }) {
                         }
                     });
 
-                    // Generate PDF
-                    const pdfBuffer = generateInvoicePDFBuffer(invoice, ticket, invoiceItems);
-
-                    const publicDir = getPublicDir();
-                    const pdfDir = path.join(publicDir, 'invoices');
-
-                    if (!fs.existsSync(pdfDir)) {
-                        fs.mkdirSync(pdfDir, { recursive: true });
-                    }
-
-                    const pdfFileName = `${invoiceNumber}.pdf`;
-                    const pdfPath = path.join(pdfDir, pdfFileName);
-
-                    fs.writeFileSync(pdfPath, Buffer.from(pdfBuffer));
-
                     // Update invoice with PDF URL
-                    const pdfUrl = `/invoices/${pdfFileName}`;
+                    const pdfUrl = `/api/admin/invoices/download/${invoice.id}`;
                     generatedInvoice = await prisma.invoice.update({
                         where: { id: invoice.id },
                         data: { pdfUrl }

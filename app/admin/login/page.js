@@ -20,7 +20,12 @@ export default function AdminLogin() {
             });
             const data = await res.json();
             if (data.success) {
-                window.location.href = data.role === 'admin' ? '/admin' : '/agent';
+                // Redirect based on role: superadmin and admin go to /admin, agents go to /agent
+                if (data.role === 'superadmin' || data.role === 'admin') {
+                    window.location.href = '/admin';
+                } else {
+                    window.location.href = '/agent';
+                }
             } else {
                 alert(data.error);
             }

@@ -42,7 +42,11 @@ export async function POST(req) {
                     status: 'Pending'
                 }
             });
-            return NextResponse.json({ success: true, message: 'Invoice generation submitted for superadmin approval' });
+            return NextResponse.json({
+                success: true,
+                message: 'Invoice generation submitted for superadmin approval',
+                pendingApproval: true
+            });
         }
 
         // Parse items
@@ -76,24 +80,20 @@ export async function POST(req) {
         const pdfBuffer = generateInvoicePDFBuffer(invoice, ticket, parsedItems);
 
         // Save PDF to public folder for direct access
-        const publicDir = getPublicDir();
-        const pdfDir = path.join(publicDir, 'invoices');
+        // Instead of saving to public (which fails on Vercel), we return it as base64
+        // so the client can download it directly.
 
-        if (!fs.existsSync(pdfDir)) {
-            fs.mkdirSync(pdfDir, { recursive: true });
-        }
-
+        // We still save the URL assuming later integration with AWS S3 / Vercel Blob
         const pdfFileName = `${invoiceNumber}.pdf`;
-        const pdfPath = path.join(pdfDir, pdfFileName);
-
-        fs.writeFileSync(pdfPath, Buffer.from(pdfBuffer));
+        const pdfUrl = `/api/admin/invoices/download/${invoice.id}`; // placeholder URL
 
         // Update invoice with PDF URL
-        const pdfUrl = `/invoices/${pdfFileName}`;
         const updatedInvoice = await prisma.invoice.update({
             where: { id: invoice.id },
             data: { pdfUrl }
         });
+
+        const pdfBase64 = Buffer.from(pdfBuffer).toString('base64');
 
         // Send email if requested
         if (shouldSendEmail) {
@@ -133,7 +133,7 @@ export async function POST(req) {
             }
         });
 
-        return NextResponse.json({ success: true, invoice: updatedInvoice });
+        return NextResponse.json({ success: true, invoice: updatedInvoice, pdfBase64 });
     } catch (err) {
         console.error("Invoice generation error:", err);
         return NextResponse.json({ error: err.message }, { status: 500 });

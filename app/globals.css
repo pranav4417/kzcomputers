@@ -553,6 +553,20 @@ h6 {
   color: var(--text-main) !important;
 }
 
+.logout-btn-hover:hover {
+  background: rgba(255, 101, 132, 0.1) !important;
+}
+
+.track-btn-hover:hover {
+  background: rgba(108, 99, 255, 0.2) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+}
+
+.tr-hover:hover {
+  background: rgba(255,255,255,0.02) !important;
+}
+
 /* Product/Service Cards */
 .card-icon {
   width: 4rem;

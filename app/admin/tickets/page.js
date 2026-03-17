@@ -224,16 +224,38 @@ export default function TicketManagement() {
             });
             const data = await res.json();
             if (res.ok) {
+                // Handle pending approval case for admin/agent roles
+                if (data.pendingApproval) {
+                    alert(data.message);
+                    setGeneratingInvoice(false);
+                    return;
+                }
+
+                if (!data.invoice) {
+                    alert('Error: No invoice returned from server');
+                    setGeneratingInvoice(false);
+                    return;
+                }
+
                 setExistingInvoice(data.invoice);
 
                 // Trigger download
-                const link = document.createElement('a');
-                link.href = data.invoice.pdfUrl;
-                link.target = '_blank';
-                link.download = `${data.invoice.invoiceNumber}.pdf`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                if (data.pdfBase64) {
+                    const link = document.createElement('a');
+                    link.href = `data:application/pdf;base64,${data.pdfBase64}`;
+                    link.download = `${data.invoice.invoiceNumber}.pdf`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else if (data.invoice.pdfUrl) {
+                    const link = document.createElement('a');
+                    link.href = data.invoice.pdfUrl;
+                    link.target = '_blank';
+                    link.download = `${data.invoice.invoiceNumber}.pdf`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
 
                 alert(`✅ Invoice ${data.invoice.invoiceNumber} generated and downloaded!`);
             } else {
@@ -266,6 +288,19 @@ export default function TicketManagement() {
             });
             const data = await res.json();
             if (res.ok) {
+                // Handle pending approval case for admin/agent roles
+                if (data.pendingApproval) {
+                    alert(data.message);
+                    setGeneratingInvoice(false);
+                    return;
+                }
+
+                if (!data.invoice) {
+                    alert('Error: No invoice returned from server');
+                    setGeneratingInvoice(false);
+                    return;
+                }
+
                 setExistingInvoice(data.invoice);
                 alert(`📧 Invoice sent to ${selectedTicket.email}!`);
             } else {
@@ -279,10 +314,27 @@ export default function TicketManagement() {
 
     const openTicketModal = (ticket) => {
         setSelectedTicket(ticket);
-        setInvoiceItems([]);
         setExistingInvoice(null);
         setIsModalOpen(true);
+
+        // First try to load from existing invoice
         fetchExistingInvoice(ticket.id);
+
+        // Also load saved items directly from ticket if no invoice items
+        if (ticket.items) {
+            try {
+                const savedItems = JSON.parse(ticket.items);
+                if (savedItems && savedItems.length > 0) {
+                    setInvoiceItems(savedItems);
+                } else {
+                    setInvoiceItems([]);
+                }
+            } catch (e) {
+                setInvoiceItems([]);
+            }
+        } else {
+            setInvoiceItems([]);
+        }
     };
 
     const filteredTickets = tickets.filter(t =>
@@ -425,8 +477,7 @@ export default function TicketManagement() {
                         />
                         <motion.div
                             initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }}
-                            className="glass"
-                            style={{ width: '100%', maxWidth: '65rem', padding: 0, position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', maxHeight: '95vh', overflow: 'hidden' }}
+                            style={{ background: '#121216', border: '1px solid var(--border-glass)', borderRadius: '1rem', width: '100%', maxWidth: '65rem', padding: 0, position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', maxHeight: '95vh', overflow: 'hidden' }}
                         >
                             {/* Modal Header */}
                             <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid var(--border-glass)', background: 'rgba(255,255,255,0.02)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>

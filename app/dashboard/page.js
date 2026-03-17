@@ -15,6 +15,11 @@ export default async function CustomerDashboard() {
         redirect('/login');
     }
 
+    const customer = await prisma.customer.findUnique({
+        where: { email: session.email },
+        select: { name: true }
+    });
+
     const tickets = await prisma.ticket.findMany({
         where: { email: session.email },
         orderBy: { createdAt: 'desc' },
@@ -39,11 +44,23 @@ export default async function CustomerDashboard() {
                 <div className="flex flex-col md:flex-row justify-between md:items-end mb-12 gap-6">
                     <div>
                         <h1 className="title-lg mb-2" style={{ fontWeight: 900 }}>My <span className="gradient-text">Dashboard</span></h1>
-                        <p className="text-dim">Welcome back! Here is the status of your service requests.</p>
+                        <p className="text-dim">Welcome back, <span style={{ color: '#fff', fontWeight: 'bold' }}>{customer?.name || 'Customer'}</span>! Here is the status of your service requests.</p>
                     </div>
-                    <Link href="/raise-ticket" className="btn-primary flex items-center gap-2">
-                        <Ticket size={20} /> Raise New Ticket
-                    </Link>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <form action={async () => {
+                            'use server';
+                            const { cookies } = await import('next/headers');
+                            (await cookies()).set('auth_token', '', { expires: new Date(0), path: '/' });
+                            redirect('/');
+                        }}>
+                            <button className="btn-secondary flex items-center gap-2 logout-btn-hover" style={{ borderColor: 'rgba(255, 101, 132, 0.3)', color: 'var(--secondary)', transition: 'all 0.2s' }}>
+                                Log Out
+                            </button>
+                        </form>
+                        <Link href="/raise-ticket" className="btn-primary flex items-center gap-2">
+                            <Ticket size={20} /> Raise New Ticket
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Stats */}
@@ -73,29 +90,31 @@ export default async function CustomerDashboard() {
                         <div className="table-wrapper">
                             <table className="data-table">
                                 <thead>
-                                    <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
-                                        <th>Ticket #</th>
-                                        <th>Product / Service</th>
-                                        <th>Status</th>
-                                        <th>Latest Update</th>
-                                        <th>Date</th>
-                                        <th style={{ textAlign: 'right' }}>Action</th>
+                                    <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border-glass)', fontSize: '0.625rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-dim)' }}>
+                                        <th style={{ padding: '1.25rem' }}>Ticket #</th>
+                                        <th style={{ padding: '1.25rem' }}>Product / Service</th>
+                                        <th style={{ padding: '1.25rem' }}>Status</th>
+                                        <th style={{ padding: '1.25rem' }}>Latest Update</th>
+                                        <th style={{ padding: '1.25rem' }}>Date</th>
+                                        <th style={{ padding: '1.25rem', textAlign: 'right' }}>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {tickets.map((ticket) => (
-                                        <tr key={ticket.id} style={{ transition: 'background 0.2s cursor-pointer' }}>
-                                            <td style={{ fontWeight: 'bold', color: 'var(--primary)', fontFamily: 'monospace', letterSpacing: '0.05em', background: 'rgba(99, 102, 241, 0.1)', padding: '0.5rem 0.75rem', borderRadius: '0.375rem', display: 'inline-block' }}>#{ticket.ticketNumber}</td>
-                                            <td>
+                                        <tr key={ticket.id} className="tr-hover" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', transition: 'var(--transition)' }}>
+                                            <td style={{ padding: '1.25rem', fontWeight: 'bold', color: 'var(--primary)', fontFamily: 'monospace', letterSpacing: '0.05em' }}>
+                                                <span style={{ background: 'rgba(99, 102, 241, 0.1)', padding: '0.5rem 0.75rem', borderRadius: '0.375rem', display: 'inline-block' }}>#{ticket.ticketNumber}</span>
+                                            </td>
+                                            <td style={{ padding: '1.25rem' }}>
                                                 <div style={{ fontSize: '0.875rem', fontWeight: 'bold' }}>{ticket.product}</div>
                                                 <div className="text-dim" style={{ fontSize: '0.65rem' }}>{ticket.serviceType}</div>
                                             </td>
-                                            <td>
+                                            <td style={{ padding: '1.25rem' }}>
                                                 <span className={`status-badge ${ticket.status === 'Open' ? 'status-open' : 'status-closed'}`}>
                                                     {ticket.status.toUpperCase()}
                                                 </span>
                                             </td>
-                                            <td className="text-dim" style={{ fontSize: '0.75rem', maxWidth: '200px' }}>
+                                            <td className="text-dim" style={{ padding: '1.25rem', fontSize: '0.75rem', maxWidth: '200px' }}>
                                                 {ticket.updates && ticket.updates.length > 0 ? (
                                                     <div>
                                                         <div style={{ color: 'var(--primary)', fontWeight: 'bold' }}>{ticket.updates[0].status}</div>
@@ -105,9 +124,9 @@ export default async function CustomerDashboard() {
                                                     <span style={{ opacity: 0.5 }}>No updates yet</span>
                                                 )}
                                             </td>
-                                            <td className="text-dim" style={{ fontSize: '0.875rem' }}>{new Date(ticket.createdAt).toLocaleDateString()}</td>
-                                            <td style={{ textAlign: 'right' }}>
-                                                <Link href={`/track/${ticket.ticketToken}`} style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--primary)', textDecoration: 'none' }} className="hover-primary">TRACK</Link>
+                                            <td className="text-dim" style={{ padding: '1.25rem', fontSize: '0.875rem' }}>{new Date(ticket.createdAt).toLocaleDateString()}</td>
+                                            <td style={{ padding: '1.25rem', textAlign: 'right' }}>
+                                                <Link href={`/track/${ticket.ticketToken}`} className="track-btn-hover hover-primary" style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-main)', textDecoration: 'none', background: 'rgba(255,255,255,0.05)', padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid rgba(255,255,255,0.1)', transition: 'all 0.2s' }}>TRACK</Link>
                                             </td>
                                         </tr>
                                     ))}

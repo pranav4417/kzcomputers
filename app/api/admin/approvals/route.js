@@ -88,15 +88,13 @@ export async function POST(req) {
                         }
                     });
 
-                    const pdfBuffer = generateInvoicePDFBuffer(invoice, ticket, parsedItems);
-                    const publicDir = getPublicDir();
-                    const pdfDir = path.join(publicDir, 'invoices');
-                    if (!fs.existsSync(pdfDir)) fs.mkdirSync(pdfDir, { recursive: true });
-                    const pdfFileName = `${invoiceNumber}.pdf`;
-                    const pdfPath = path.join(pdfDir, pdfFileName);
-                    fs.writeFileSync(pdfPath, Buffer.from(pdfBuffer));
+                    // Also save items to the ticket for future reference
+                    await prisma.ticket.update({
+                        where: { id: pending.entityId },
+                        data: { items: JSON.stringify(parsedItems) }
+                    });
 
-                    const pdfUrl = `/invoices/${pdfFileName}`;
+                    const pdfUrl = `/api/admin/invoices/download/${invoice.id}`;
                     await prisma.invoice.update({ where: { id: invoice.id }, data: { pdfUrl } });
 
                     if (data.sendEmail) {

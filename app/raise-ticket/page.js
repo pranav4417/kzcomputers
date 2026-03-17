@@ -15,6 +15,22 @@ export default function RaiseTicket() {
     const [submitted, setSubmitted] = useState(false);
     const [ticketInfo, setTicketInfo] = useState(null);
 
+    React.useEffect(() => {
+        fetch('/api/auth/session-check')
+            .then(res => res.json())
+            .then(data => {
+                if (data.user && data.user.role === 'customer') {
+                    setFormData(prev => ({
+                        ...prev,
+                        customerName: data.user.name || '',
+                        email: data.user.email || '',
+                        phone: data.user.phone || ''
+                    }));
+                }
+            })
+            .catch(console.error);
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
