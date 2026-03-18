@@ -11,27 +11,34 @@ export default function AdminOverviewClient({ stats, recentTickets }) {
     const [showExportModal, setShowExportModal] = useState(false);
     const router = useRouter();
 
-    const cards = [
+    const isAgent = stats.role === 'agent';
+
+    const cards = isAgent ? [
+        { name: 'Assigned Tickets', value: stats.totalTickets, icon: Ticket, color: 'var(--primary)' },
+        { name: 'Active Repairs', value: stats.openTickets, icon: Clock, color: '#ffc107' },
+        { name: 'Completed Tasks', value: stats.completedTickets, icon: CheckCircle2, color: '#28a745' },
+        { name: 'Urgent Tickets', value: stats.otherStat, icon: AlertCircle, color: 'var(--secondary)' },
+    ] : [
         { name: 'Total Tickets', value: stats.totalTickets, icon: Ticket, color: 'var(--primary)' },
         { name: 'Open Queries', value: stats.openTickets, icon: Clock, color: '#ffc107' },
         { name: 'Fixed Today', value: stats.completedTickets, icon: CheckCircle2, color: '#28a745' },
-        { name: 'Products Live', value: stats.totalProducts, icon: ShoppingBag, color: 'var(--secondary)' },
+        { name: 'Products Live', value: stats.otherStat, icon: ShoppingBag, color: 'var(--secondary)' },
     ];
 
     // Use real service distribution data from stats
-    const serviceStats = stats.serviceStats || [
-        { name: 'Laptops', percentage: 65 },
-        { name: 'CCTV Installation', percentage: 20 },
-        { name: 'Custom PCs', percentage: 15 }
-    ];
+    const serviceStats = stats.serviceStats || [];
 
     return (
         <>
             <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>
-                        <h1 className="title-lg mb-2" style={{ margin: 0, fontWeight: 900 }}>Systems <span className="gradient-text">Overview</span></h1>
-                        <p className="text-dim mt-4" style={{ fontSize: '0.875rem' }}>Real-time performance metrics and recent activities.</p>
+                        <h1 className="title-lg mb-2" style={{ margin: 0, fontWeight: 900 }}>
+                            {isAgent ? 'Workbench' : 'Systems'} <span className="gradient-text">Overview</span>
+                        </h1>
+                        <p className="text-dim mt-4" style={{ fontSize: '0.875rem' }}>
+                            {isAgent ? `Hello ${stats.username}, here is your current technical queue.` : 'Real-time performance metrics and system-wide activities.'}
+                        </p>
                     </div>
                     {/* Export Data Button */}
                     <button

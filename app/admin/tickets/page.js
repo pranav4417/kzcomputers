@@ -75,9 +75,13 @@ export default function TicketManagement() {
 
     const fetchAgents = async () => {
         const res = await fetch('/api/admin/agents');
-        const data = await res.json();
-        // Agents and admins cannot assign tickets to super admin
-        setAgents(data.filter(a => a.status === 'active' && a.role !== 'superadmin'));
+        if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data)) {
+                // Agents and admins cannot assign tickets to super admin
+                setAgents(data.filter(a => a.status === 'active' && a.role !== 'superadmin'));
+            }
+        }
     };
 
     const fetchProducts = async () => {
@@ -418,9 +422,37 @@ export default function TicketManagement() {
                                                     <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#e5e7eb' }}>{ticket.assignedTo.username}</span>
                                                 </div>
                                             ) : (
-                                                <span style={{ fontSize: '0.65rem', fontWeight: 'bold', padding: '0.25rem 0.5rem', borderRadius: '0.25rem', background: 'rgba(255,255,255,0.05)', color: 'var(--text-dim)', display: 'inline-flex', alignItems: 'center', gap: '0.25rem', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                                    <UserPlus size={10} /> Unassigned
-                                                </span>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                    <span style={{ fontSize: '0.65rem', fontWeight: 'bold', padding: '0.25rem 0.5rem', borderRadius: '0.25rem', background: 'rgba(255,255,255,0.05)', color: 'var(--text-dim)', display: 'inline-flex', alignItems: 'center', gap: '0.25rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                                        <UserPlus size={10} /> Unassigned
+                                                    </span>
+                                                    {session?.role === 'agent' && (
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                updateTicketDetails(ticket.id, ticket.status, `Self-assigned by agent ${session.username}.`, session.id);
+                                                            }}
+                                                            style={{
+                                                                padding: '0.25rem 0.6rem',
+                                                                background: 'rgba(108, 99, 255, 0.1)',
+                                                                border: '1px solid rgba(108, 99, 255, 0.3)',
+                                                                borderRadius: '0.5rem',
+                                                                color: 'var(--primary)',
+                                                                fontSize: '0.65rem',
+                                                                fontWeight: 900,
+                                                                cursor: 'pointer',
+                                                                transition: 'all 0.2s',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '0.25rem'
+                                                            }}
+                                                            onMouseOver={e => { e.currentTarget.style.background = 'var(--primary)'; e.currentTarget.style.color = '#fff' }}
+                                                            onMouseOut={e => { e.currentTarget.style.background = 'rgba(108, 99, 255, 0.1)'; e.currentTarget.style.color = 'var(--primary)' }}
+                                                        >
+                                                            <Plus size={12} /> Take Over
+                                                        </button>
+                                                    )}
+                                                </div>
                                             )}
                                         </td>
                                         <td style={{ padding: '1.5rem 2rem' }}>
@@ -625,11 +657,11 @@ export default function TicketManagement() {
                                                 )}
                                                 {activeTab === 'custom' && (
                                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                                        <input value={customItem.desc} onChange={e => setCustomItem({...customItem, desc: e.target.value})} className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }} placeholder="Description" />
+                                                        <input value={customItem.desc} onChange={e => setCustomItem({ ...customItem, desc: e.target.value })} className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }} placeholder="Description" />
                                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
-                                                            <input type="number" value={customItem.qty} onChange={e => setCustomItem({...customItem, qty: e.target.value})} className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }} placeholder="Qty" />
-                                                            <select value={customItem.unit} onChange={e => setCustomItem({...customItem, unit: e.target.value})} className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }}><option value="NOS">NOS</option></select>
-                                                            <input type="number" value={customItem.price} onChange={e => setCustomItem({...customItem, price: e.target.value})} className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }} placeholder="Price" />
+                                                            <input type="number" value={customItem.qty} onChange={e => setCustomItem({ ...customItem, qty: e.target.value })} className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }} placeholder="Qty" />
+                                                            <select value={customItem.unit} onChange={e => setCustomItem({ ...customItem, unit: e.target.value })} className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }}><option value="NOS">NOS</option></select>
+                                                            <input type="number" value={customItem.price} onChange={e => setCustomItem({ ...customItem, price: e.target.value })} className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }} placeholder="Price" />
                                                         </div>
                                                         <button onClick={addCustomItem} className="btn-primary" style={{ padding: '0.75rem', borderRadius: '0.5rem' }}>Add Item</button>
                                                     </div>
@@ -656,7 +688,7 @@ export default function TicketManagement() {
                                                         </div>
                                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                             <span style={{ fontSize: '0.875rem', fontWeight: 'bold', color: '#fff' }}>{existingInvoice.invoiceNumber}</span>
-                                                            <button 
+                                                            <button
                                                                 onClick={() => window.open(`/api/admin/invoices/download/${existingInvoice.id}`, '_blank')}
                                                                 style={{ padding: '0.4rem 0.8rem', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '0.5rem', color: '#fff', fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
                                                             >
@@ -687,16 +719,16 @@ export default function TicketManagement() {
                                                         </div>
                                                     )}
                                                     <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                                        <button 
-                                                            onClick={generateAndDownloadPDF} 
+                                                        <button
+                                                            onClick={generateAndDownloadPDF}
                                                             disabled={generatingInvoice}
                                                             style={{ flex: 1, padding: '0.75rem', background: '#4ade80', color: '#000', borderRadius: '0.5rem', fontWeight: 'bold', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', opacity: generatingInvoice ? 0.7 : 1 }}
                                                         >
                                                             {generatingInvoice ? <Loader2 size={16} className="animate-spin" /> : <FileText size={16} />}
                                                             {existingInvoice ? 'Update & Download' : 'Generate PDF'}
                                                         </button>
-                                                        <button 
-                                                            onClick={sendInvoiceToCustomer} 
+                                                        <button
+                                                            onClick={sendInvoiceToCustomer}
                                                             disabled={generatingInvoice}
                                                             style={{ flex: 1, padding: '0.75rem', background: 'var(--primary)', color: '#fff', borderRadius: '0.5rem', fontWeight: 'bold', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', opacity: generatingInvoice ? 0.7 : 1 }}
                                                         >

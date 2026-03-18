@@ -204,14 +204,20 @@ export default function AdminLayout({ children }) {
         { name: 'Overview', href: '/admin', icon: LayoutDashboard },
         { name: 'Tickets', href: '/admin/tickets', icon: Ticket },
         { name: 'Quotes', href: '/admin/quotes', icon: Package },
-        { name: 'Products', href: '/admin/products', icon: Package },
-        { name: 'Services', href: '/admin/services', icon: Hammer },
-        { name: 'Group Service', href: '/admin/group-service', icon: Settings },
-        { name: 'Appearance', href: '/admin/appearance', icon: Palette, roleRequirement: 'superadmin' },
-        { name: 'Agents', href: '/admin/agents', icon: Users },
-        { name: 'Approvals', href: '/admin/approvals', icon: Shield, roleRequirement: 'superadmin' },
-        { name: 'Data Export', href: '/admin/export', icon: Download },
-    ].filter(item => !item.roleRequirement || user?.role?.toLowerCase() === item.roleRequirement);
+        { name: 'Products', href: '/admin/products', icon: Package, roleRequirement: ['admin', 'superadmin'] },
+        { name: 'Services', href: '/admin/services', icon: Hammer, roleRequirement: ['admin', 'superadmin'] },
+        { name: 'Group Service', href: '/admin/group-service', icon: Settings, roleRequirement: ['admin', 'superadmin'] },
+        { name: 'Appearance', href: '/admin/appearance', icon: Palette, roleRequirement: ['superadmin'] },
+        { name: 'Agents', href: '/admin/agents', icon: Users, roleRequirement: ['admin', 'superadmin'] },
+        { name: 'Approvals', href: '/admin/approvals', icon: Shield, roleRequirement: ['superadmin'] },
+        { name: 'Data Export', href: '/admin/export', icon: Download, roleRequirement: ['admin', 'superadmin'] },
+    ].filter(item => {
+        if (!item.roleRequirement) return true;
+        const userRole = user?.role?.toLowerCase();
+        return Array.isArray(item.roleRequirement) 
+            ? item.roleRequirement.includes(userRole) 
+            : userRole === item.roleRequirement;
+    });
 
     return (
         <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-dark)', color: 'var(--text-main)', overflow: 'hidden' }}>
@@ -288,7 +294,8 @@ export default function AdminLayout({ children }) {
                         <div style={{ textAlign: 'right' }}>
                             <p style={{ fontSize: '0.875rem', fontWeight: 'bold', margin: 0 }}>{user?.username || 'Admin User'}</p>
                             <p style={{ fontSize: '0.625rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 900, color: 'var(--primary)', margin: 0 }}>
-                                {user?.role?.toLowerCase() === 'superadmin' ? 'Super Admin Control' : 'Administrator Panel'}
+                                {user?.role?.toLowerCase() === 'superadmin' ? 'Super Admin Control' : 
+                                 user?.role?.toLowerCase() === 'agent' ? 'Agent Workbench' : 'Administrator Panel'}
                             </p>
                         </div>
                         <div style={{ width: '2.5rem', height: '2.5rem', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', padding: '2px' }}>

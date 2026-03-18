@@ -20,11 +20,11 @@ export default function AdminLogin() {
             });
             const data = await res.json();
             if (data.success) {
-                // Redirect based on role: superadmin and admin go to /admin, agents go to /agent
-                if (data.role === 'superadmin' || data.role === 'admin') {
+                // Redirect all staff (superadmin, admin, agent) to /admin
+                if (data.role === 'superadmin' || data.role === 'admin' || data.role === 'agent') {
                     window.location.href = '/admin';
                 } else {
-                    window.location.href = '/agent';
+                    window.location.href = '/';
                 }
             } else {
                 alert(data.error);

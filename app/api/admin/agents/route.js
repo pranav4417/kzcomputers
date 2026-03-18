@@ -6,7 +6,7 @@ import { requireAuth } from '@/lib/auth';
 export async function GET() {
     try {
         // Check authentication
-        const session = await requireAuth(['admin', 'superadmin']);
+        const session = await requireAuth(['agent', 'admin', 'superadmin']);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
