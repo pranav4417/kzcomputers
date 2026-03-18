@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
+import { v2 as cloudinary } from 'cloudinary';
+
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 // GET - Fetch all parts (public for viewing)
 export async function GET(req) {
@@ -41,6 +49,33 @@ export async function POST(req) {
 
         const formData = await req.formData();
 
+        // Handle image upload to Cloudinary
+        const image = formData.get('image');
+        let imageUrl = null;
+        if (image && typeof image !== 'string' && image.size > 0) {
+            try {
+                const bytes = await image.arrayBuffer();
+                const buffer = Buffer.from(bytes);
+                const fileName = `${Date.now()}-${image.name}`;
+
+                const uploadResult = await new Promise((resolve, reject) => {
+                    cloudinary.uploader.upload_stream(
+                        {
+                            public_id: `parts/${fileName.replace(/\.[^/.]+$/, '')}`,
+                            folder: 'suraksha/parts'
+                        },
+                        (error, result) => {
+                            if (error) reject(error);
+                            else resolve(result);
+                        }
+                    ).end(buffer);
+                });
+                imageUrl = uploadResult.secure_url;
+            } catch (uploadError) {
+                console.error('Cloudinary upload error:', uploadError);
+            }
+        }
+
         const part = await prisma.part.create({
             data: {
                 name: formData.get('name'),
@@ -54,7 +89,7 @@ export async function POST(req) {
                 stock: parseInt(formData.get('stock')) || 0,
                 minStock: parseInt(formData.get('minStock')) || 0,
                 unit: formData.get('unit') || 'NOS',
-                image: formData.get('image') || null,
+                image: imageUrl || formData.get('image') || null,
                 isActive: formData.get('isActive') !== 'false',
             }
         });
@@ -77,6 +112,33 @@ export async function PUT(req) {
         const formData = await req.formData();
         const id = parseInt(formData.get('id'));
 
+        // Handle image upload to Cloudinary
+        const image = formData.get('image');
+        let imageUrl = null;
+        if (image && typeof image !== 'string' && image.size > 0) {
+            try {
+                const bytes = await image.arrayBuffer();
+                const buffer = Buffer.from(bytes);
+                const fileName = `${Date.now()}-${image.name}`;
+
+                const uploadResult = await new Promise((resolve, reject) => {
+                    cloudinary.uploader.upload_stream(
+                        {
+                            public_id: `parts/${fileName.replace(/\.[^/.]+$/, '')}`,
+                            folder: 'suraksha/parts'
+                        },
+                        (error, result) => {
+                            if (error) reject(error);
+                            else resolve(result);
+                        }
+                    ).end(buffer);
+                });
+                imageUrl = uploadResult.secure_url;
+            } catch (uploadError) {
+                console.error('Cloudinary upload error:', uploadError);
+            }
+        }
+
         const part = await prisma.part.update({
             where: { id },
             data: {
@@ -91,7 +153,7 @@ export async function PUT(req) {
                 stock: parseInt(formData.get('stock')) || 0,
                 minStock: parseInt(formData.get('minStock')) || 0,
                 unit: formData.get('unit') || 'NOS',
-                image: formData.get('image') || null,
+                image: imageUrl || formData.get('image') || null,
                 isActive: formData.get('isActive') !== 'false',
             }
         });

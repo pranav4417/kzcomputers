@@ -1,9 +1,17 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { sendTicketEmail } from '@/lib/email';
+import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
+
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 export async function POST(req) {
     try {
@@ -25,17 +33,33 @@ export async function POST(req) {
         const ticketNumber = `SUK-${datePart}${randomPart}`;
         const ticketToken = crypto.randomBytes(16).toString('hex');
 
-        // 2. Handle Image Upload
+        // 2. Handle Image Upload to Cloudinary
         let imagePath = null;
         if (image && typeof image !== 'string') {
             const bytes = await image.arrayBuffer();
             const buffer = Buffer.from(bytes);
             const ext = path.extname(image.name) || '.jpg';
             const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}${ext}`;
-            const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'tickets');
-            await fs.mkdir(uploadDir, { recursive: true });
-            imagePath = `/uploads/tickets/${fileName}`;
-            await fs.writeFile(path.join(uploadDir, fileName), buffer);
+
+            // Upload to Cloudinary
+            try {
+                const uploadResult = await new Promise((resolve, reject) => {
+                    cloudinary.uploader.upload_stream(
+                        {
+                            public_id: `tickets/${fileName.replace(/\.[^/.]+$/, '')}`,
+                            folder: 'suraksha/tickets'
+                        },
+                        (error, result) => {
+                            if (error) reject(error);
+                            else resolve(result);
+                        }
+                    ).end(buffer);
+                });
+                imagePath = uploadResult.secure_url;
+            } catch (uploadError) {
+                console.error('Cloudinary upload error:', uploadError);
+                // Continue without image if upload fails
+            }
         }
 
         // 3. Save to Database

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-    Plus, Search, Edit2, Trash2, Camera, Loader2, X
+    Plus, Search, Edit2, Trash2, Camera, Loader2, X, Share2, Check
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
@@ -15,6 +15,7 @@ export default function ProductManagement() {
     const [formData, setFormData] = useState({ name: '', description: '', price: '' });
     const [image, setImage] = useState(null);
     const [saving, setSaving] = useState(false);
+    const [copied, setCopied] = useState(false);
 
     useEffect(() => { fetchProducts(); }, []);
 
@@ -61,6 +62,13 @@ export default function ProductManagement() {
         fetchProducts();
     };
 
+    const shareProduct = (product) => {
+        const url = `${window.location.origin}/?product=${product.id}`;
+        navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
     return (
         <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
@@ -92,6 +100,7 @@ export default function ProductManagement() {
                                 <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.1)', fontWeight: 900, letterSpacing: '0.2em' }}>NO IMAGE</div>
                             )}
                             <div style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', display: 'flex', gap: '0.5rem' }}>
+                                <button onClick={() => shareProduct(product)} style={{ padding: '0.5rem', background: 'rgba(0,0,0,0.6)', borderRadius: '0.5rem', cursor: 'pointer', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }} title="Share Product"><Share2 size={16} /></button>
                                 <button onClick={() => { setEditingProduct(product); setFormData(product); setIsModalOpen(true); }} style={{ padding: '0.5rem', background: 'rgba(0,0,0,0.6)', borderRadius: '0.5rem', cursor: 'pointer', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }} title="Edit Product"><Edit2 size={16} /></button>
                                 <button onClick={() => deleteProduct(product.id)} style={{ padding: '0.5rem', background: 'rgba(0,0,0,0.6)', borderRadius: '0.5rem', cursor: 'pointer', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }} title="Delete Product"><Trash2 size={16} /></button>
                             </div>

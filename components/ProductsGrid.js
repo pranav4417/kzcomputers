@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { ShoppingCart, Star, X, Loader2, Send } from 'lucide-react';
+import { ShoppingCart, Star, X, Loader2, Send, Share2, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ProductsGrid() {
@@ -10,6 +10,7 @@ export default function ProductsGrid() {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [copied, setCopied] = useState(false);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -17,6 +18,17 @@ export default function ProductsGrid() {
             const data = await res.json();
             setProducts(data);
             setLoading(false);
+
+            // Check for product query parameter to open modal automatically
+            const params = new URLSearchParams(window.location.search);
+            const productId = params.get('product');
+            if (productId) {
+                const product = data.find(p => p.id === parseInt(productId));
+                if (product) {
+                    setSelectedProduct(product);
+                    setIsModalOpen(true);
+                }
+            }
         };
         fetchProducts();
     }, []);
@@ -44,6 +56,14 @@ export default function ProductsGrid() {
             alert('Failed to submit quote request. Please try again.');
         }
         setSubmitting(false);
+    };
+
+    const handleShare = (product, e) => {
+        e.stopPropagation();
+        const url = window.location.origin + '/?product=' + product.id;
+        navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
     };
 
     if (loading) return <div className="p-20 flex justify-center"><Loader2 className="animate-spin text-primary w-8 h-8" /></div>;
@@ -85,10 +105,17 @@ export default function ProductsGrid() {
                                     <div className="flex gap-4 mt-auto">
                                         <button
                                             onClick={() => { setSelectedProduct(product); setIsModalOpen(true); }}
-                                            className="w-full py-3 bg-primary/20 text-primary hover:bg-primary hover:text-white transition-colors text-sm font-bold flex items-center justify-center gap-2 rounded-xl group border border-primary/20 hover:border-transparent"
+                                            className="flex-1 py-3 bg-primary/20 text-primary hover:bg-primary hover:text-white transition-colors text-sm font-bold flex items-center justify-center gap-2 rounded-xl group border border-primary/20 hover:border-transparent"
                                         >
                                             <ShoppingCart size={16} className="group-hover:scale-110 transition-transform" />
                                             Request Quote
+                                        </button>
+                                        <button
+                                            onClick={(e) => handleShare(product, e)}
+                                            className="py-3 px-4 bg-white/5 text-text-dim hover:bg-white/10 hover:text-white transition-colors text-sm font-bold flex items-center justify-center gap-2 rounded-xl border border-white/10"
+                                            title="Share this product"
+                                        >
+                                            {copied ? <Check size={16} className="text-green-400" /> : <Share2 size={16} />}
                                         </button>
                                     </div>
                                 </div>
@@ -115,7 +142,25 @@ export default function ProductsGrid() {
                                 <X size={20} />
                             </button>
 
-                            <h3 className="text-2xl font-black mb-2">Configure <span className="gradient-text">Quote</span></h3>
+                            <div className="flex items-center gap-2 mb-4">
+                                <h3 className="text-2xl font-black mb-0">Configure <span className="gradient-text">Quote</span></h3>
+                                <button
+                                    onClick={() => {
+                                        const url = window.location.origin + '/?product=' + selectedProduct.id;
+                                        navigator.clipboard.writeText(url);
+                                        setCopied(true);
+                                        setTimeout(() => setCopied(false), 2000);
+                                    }}
+                                    className="ml-auto text-xs font-bold flex items-center gap-1 px-3 py-1.5 rounded-lg border transition-all"
+                                    style={{
+                                        background: copied ? 'rgba(52, 199, 89, 0.2)' : 'rgba(255,255,255,0.05)',
+                                        borderColor: copied ? 'rgba(52, 199, 89, 0.3)' : 'rgba(255,255,255,0.1)',
+                                        color: copied ? '#4ade80' : 'var(--text-dim)'
+                                    }}
+                                >
+                                    {copied ? <><Check size={12} /> Copied!</> : <><Share2 size={12} /> Share</>}
+                                </button>
+                            </div>
                             <p className="text-sm text-text-dim mb-8">You are requesting an estimate for <strong>{selectedProduct.name}</strong> at base ₹{Number(selectedProduct.price).toLocaleString()}. Please provide your details below.</p>
 
                             <form onSubmit={handleSubmitQuote} className="space-y-5">
