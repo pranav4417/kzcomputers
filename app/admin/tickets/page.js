@@ -10,38 +10,6 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Quick service presets - like a restaurant menu
-const SERVICE_PRESETS = [
-    { id: 1, name: 'Diagnostic Fee', price: 299, icon: Search },
-    { id: 2, name: 'Service Charge', price: 199, icon: Wrench },
-    { id: 3, name: 'Installation', price: 499, icon: Zap },
-    { id: 4, name: 'Repair/Labour', price: 399, icon: HardDrive },
-    { id: 5, name: 'Home Visit', price: 249, icon: Package },
-    { id: 6, name: 'Data Recovery', price: 999, icon: HardDrive },
-    { id: 7, name: 'Software Setup', price: 399, icon: Monitor },
-    { id: 8, name: 'Virus Removal', price: 499, icon: ShieldAlert },
-];
-
-// Quick parts/parts presets
-const PARTS_PRESETS = [
-    { id: 1, name: 'HDMI Cable (2m)', price: 150, icon: Cable },
-    { id: 2, name: 'USB Cable', price: 80, icon: Cable },
-    { id: 3, name: 'Mouse', price: 299, icon: Mouse },
-    { id: 4, name: 'Keyboard', price: 499, icon: Keyboard },
-    { id: 5, name: 'Pendrive 32GB', price: 350, icon: HardDrive },
-    { id: 6, name: 'Pendrive 64GB', price: 550, icon: HardDrive },
-    { id: 7, name: 'Hard Disk 1TB', price: 3500, icon: HardDrive },
-    { id: 8, name: 'SSD 256GB', price: 2200, icon: HardDrive },
-    { id: 9, name: 'RAM 4GB', price: 1200, icon: HardDrive },
-    { id: 10, name: 'RAM 8GB', price: 2200, icon: HardDrive },
-    { id: 11, name: 'Webcam', price: 699, icon: Camera },
-    { id: 12, name: 'Headphones', price: 499, icon: Headphones },
-    { id: 13, name: 'WiFi Dongle', price: 599, icon: Wifi },
-    { id: 14, name: 'Bluetooth Speaker', price: 899, icon: Speaker },
-    { id: 15, name: 'Printer Cartridge', price: 400, icon: Printer },
-    { id: 16, name: 'Power Adapter', price: 349, icon: Zap },
-];
-
 function Cable({ size }) { return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>; }
 
 export default function TicketManagement() {
@@ -62,11 +30,40 @@ export default function TicketManagement() {
     const [sendEmailChecked, setSendEmailChecked] = useState(true);
     const [existingInvoice, setExistingInvoice] = useState(null);
 
+    const [servicePresets, setServicePresets] = useState([]);
+    const [partsPresets, setPartsPresets] = useState([]);
+
+    const [session, setSession] = useState(null);
+
     useEffect(() => {
+        const checkUserSession = async () => {
+            try {
+                const res = await fetch('/api/auth/session-check');
+                const data = await res.json();
+                if (data.user) setSession(data.user);
+            } catch (e) { console.error('Session check failed'); }
+        };
+        checkUserSession();
         fetchTickets();
         fetchAgents();
         fetchProducts();
+        fetchPresets();
     }, []);
+
+    const fetchPresets = async () => {
+        try {
+            const [partsRes, chargesRes] = await Promise.all([
+                fetch('/api/admin/parts'),
+                fetch('/api/admin/charges')
+            ]);
+            const partsData = await partsRes.json();
+            const chargesData = await chargesRes.json();
+            setPartsPresets(Array.isArray(partsData) ? partsData : []);
+            setServicePresets(Array.isArray(chargesData) ? chargesData : []);
+        } catch (error) {
+            console.error('Error fetching presets:', error);
+        }
+    };
 
     const fetchTickets = async () => {
         setLoading(true);
@@ -79,7 +76,8 @@ export default function TicketManagement() {
     const fetchAgents = async () => {
         const res = await fetch('/api/admin/agents');
         const data = await res.json();
-        setAgents(data.filter(a => a.status === 'active'));
+        // Agents and admins cannot assign tickets to super admin
+        setAgents(data.filter(a => a.status === 'active' && a.role !== 'superadmin'));
     };
 
     const fetchProducts = async () => {
@@ -169,7 +167,7 @@ export default function TicketManagement() {
             setInvoiceItems([...invoiceItems, {
                 desc: item.name,
                 qty: 1,
-                unit: 'NOS',
+                unit: item.unit || 'NOS',
                 price: item.price
             }]);
         }
@@ -466,383 +464,244 @@ export default function TicketManagement() {
                 )}
             </div>
 
-            {/* Sophisticated Invoice Modal */}
+            {/* Sophisticated Slide-out Pane */}
             <AnimatePresence>
                 {isModalOpen && selectedTicket && (
-                    <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', overflowY: 'auto' }}>
+                    <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', justifyContent: 'flex-end' }}>
                         <motion.div
-                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
                             onClick={() => setIsModalOpen(false)}
-                            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
+                            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
                         />
                         <motion.div
-                            initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }}
-                            style={{ background: '#121216', border: '1px solid var(--border-glass)', borderRadius: '1rem', width: '100%', maxWidth: '65rem', padding: 0, position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', maxHeight: '95vh', overflow: 'hidden' }}
+                            initial={{ x: '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '100%' }}
+                            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                            style={{
+                                background: '#0a0a0f',
+                                borderLeft: '1px solid var(--border-glass)',
+                                width: '95%',
+                                maxWidth: '900px',
+                                height: '100vh',
+                                position: 'relative',
+                                zIndex: 10,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                overflow: 'hidden',
+                                boxShadow: '-10px 0 50px rgba(0, 0, 0, 0.5)'
+                            }}
                         >
                             {/* Modal Header */}
-                            <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid var(--border-glass)', background: 'rgba(255,255,255,0.02)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+                            <div style={{ padding: '1.5rem 2.5rem', borderBottom: '1px solid var(--border-glass)', background: 'rgba(255,255,255,0.02)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                                    <div style={{ width: '3.5rem', height: '3.5rem', borderRadius: '1rem', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 16px -4px var(--primary-glow)' }}>
+                                        <Edit2 size={24} color="#fff" />
+                                    </div>
                                     <div>
-                                        <h3 style={{ fontSize: '1.5rem', fontWeight: 900, margin: '0 0 0.5rem 0' }}>Update <span className="gradient-text" style={{ fontFamily: 'monospace', letterSpacing: '0.05em' }}>#{selectedTicket.ticketNumber}</span></h3>
-                                        <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>{selectedTicket.customerName} • {selectedTicket.product}</p>
+                                        <h3 style={{ fontSize: '1.75rem', fontWeight: 900, margin: '0 0 0.25rem 0', letterSpacing: '-0.025em' }}>Update <span className="text-primary" style={{ fontFamily: 'monospace' }}>#{selectedTicket.ticketNumber}</span></h3>
+                                        <p style={{ fontSize: '0.875rem', color: 'var(--text-dim)', fontWeight: 600, margin: 0 }}>{selectedTicket.customerName} • {selectedTicket.product}</p>
                                     </div>
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <div style={{ padding: '0.5rem 1rem', borderRadius: '9999px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.75rem', fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', background: 'rgba(255,255,255,0.05)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                                    <div style={{ padding: '0.625rem 1.25rem', borderRadius: '1rem', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.75rem', fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', background: 'rgba(255,255,255,0.05)', color: '#fff' }}>
                                         {selectedTicket.status}
                                     </div>
-                                    <button onClick={() => setIsModalOpen(false)} style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '0.5rem', cursor: 'pointer', color: 'var(--text-dim)' }}>
-                                        <X size={20} />
+                                    <button onClick={() => setIsModalOpen(false)} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '0.75rem', cursor: 'pointer', color: 'var(--text-dim)', transition: 'all 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'}>
+                                        <X size={24} />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Modal Content */}
                             <div style={{ padding: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-
                                 {/* Status & Assignment Section */}
-                                <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'rgba(0,0,0,0.2)' }}>
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', alignItems: 'end' }}>
-                                        <div>
-                                            <label style={{ fontSize: '0.625rem', textTransform: 'uppercase', fontWeight: 900, color: 'var(--text-dim)', letterSpacing: '0.1em', marginBottom: '0.5rem', display: 'block' }}>Technician</label>
-                                            <select
-                                                id="assign-select"
-                                                defaultValue={selectedTicket.assignedToId || ''}
-                                                className="input-field"
-                                                style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.75rem', fontSize: '0.875rem', fontWeight: 'bold', appearance: 'none' }}
-                                            >
-                                                <option value="" style={{ background: 'var(--bg-dark)' }}>Unassigned</option>
-                                                {agents.map(a => (
-                                                    <option key={a.id} value={a.id} style={{ background: 'var(--bg-dark)' }}>{a.username}</option>
-                                                ))}
-                                            </select>
+                                <div style={{ padding: '1.5rem 2.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.01)', flexShrink: 0 }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem' }}>
+                                        <div className="space-y-2">
+                                            <label style={{ fontSize: '0.625rem', textTransform: 'uppercase', fontWeight: 900, color: 'var(--text-dim)', letterSpacing: '0.15em', display: 'block' }}>Assigned Technician</label>
+                                            <div style={{ position: 'relative' }}>
+                                                <select
+                                                    id="assign-select"
+                                                    defaultValue={selectedTicket.assignedToId || ''}
+                                                    className="input-field"
+                                                    style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '1rem', fontSize: '0.875rem', fontWeight: 700, appearance: 'none', border: '1px solid rgba(255,255,255,0.05)' }}
+                                                >
+                                                    <option value="" style={{ background: 'var(--bg-dark)' }}>Unassigned</option>
+                                                    {agents.map(a => (
+                                                        <option key={a.id} value={a.id} style={{ background: 'var(--bg-dark)' }}>{a.username}</option>
+                                                    ))}
+                                                </select>
+                                                <div style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', opacity: 0.5 }}>
+                                                    <UserPlus size={16} />
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <label style={{ fontSize: '0.625rem', textTransform: 'uppercase', fontWeight: 900, color: 'var(--text-dim)', letterSpacing: '0.1em', marginBottom: '0.5rem', display: 'block' }}>Status</label>
-                                            <select
-                                                id="status-select"
-                                                defaultValue={selectedTicket.status}
-                                                className="input-field"
-                                                style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.75rem', fontSize: '0.875rem', fontWeight: 'bold', appearance: 'none' }}
-                                            >
-                                                <option value="Open" style={{ background: 'var(--bg-dark)' }}>Open</option>
-                                                <option value="In Progress" style={{ background: 'var(--bg-dark)' }}>In Progress</option>
-                                                <option value="Pending Parts" style={{ background: 'var(--bg-dark)' }}>Pending Parts</option>
-                                                <option value="Completed" style={{ background: 'var(--bg-dark)' }}>Completed ✅</option>
-                                                <option value="Closed" style={{ background: 'var(--bg-dark)' }}>Closed 🔒</option>
-                                            </select>
+                                        <div className="space-y-2">
+                                            <label style={{ fontSize: '0.625rem', textTransform: 'uppercase', fontWeight: 900, color: 'var(--text-dim)', letterSpacing: '0.15em', display: 'block' }}>Ticket Status</label>
+                                            <div style={{ position: 'relative' }}>
+                                                <select
+                                                    id="status-select"
+                                                    defaultValue={selectedTicket.status}
+                                                    className="input-field"
+                                                    style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '1rem', fontSize: '0.875rem', fontWeight: 700, appearance: 'none', border: '1px solid rgba(255,255,255,0.05)' }}
+                                                >
+                                                    <option value="Open">Open</option>
+                                                    <option value="In Progress">In Progress</option>
+                                                    <option value="Pending Parts">Pending Parts</option>
+                                                    <option value="Completed">Completed ✅</option>
+                                                    <option value="Closed">Closed 🔒</option>
+                                                </select>
+                                                <div style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', opacity: 0.5 }}>
+                                                    <Filter size={16} />
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <label style={{ fontSize: '0.625rem', textTransform: 'uppercase', fontWeight: 900, color: 'var(--text-dim)', letterSpacing: '0.1em', marginBottom: '0.5rem', display: 'block' }}>Note</label>
-                                            <input
-                                                id="comments-textarea"
-                                                defaultValue={""}
-                                                className="input-field"
-                                                style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.75rem', fontSize: '0.875rem' }}
-                                                placeholder="Status update note..."
-                                            />
+                                        <div className="space-y-2">
+                                            <label style={{ fontSize: '0.625rem', textTransform: 'uppercase', fontWeight: 900, color: 'var(--text-dim)', letterSpacing: '0.15em', display: 'block' }}>Update Note</label>
+                                            <div style={{ position: 'relative' }}>
+                                                <input
+                                                    id="comments-textarea"
+                                                    defaultValue={""}
+                                                    className="input-field"
+                                                    style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '1rem', fontSize: '0.875rem', border: '1px solid rgba(255,255,255,0.05)' }}
+                                                    placeholder="Status update note..."
+                                                />
+                                                <div style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', opacity: 0.5 }}>
+                                                    <FileText size={16} />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Sophisticated Billing Section - POS Style */}
-                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '500px' }}>
-
-                                    {/* Billing Header */}
-                                    <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'linear-gradient(135deg, rgba(108, 99, 255, 0.1) 0%, rgba(74, 222, 128, 0.05) 100%)' }}>
+                                {/* Billing Section */}
+                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '600px', background: 'rgba(0,0,0,0.1)' }}>
+                                    <div style={{ padding: '1.25rem 2.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'linear-gradient(to right, rgba(108, 99, 255, 0.05), rgba(0,0,0,0))', flexShrink: 0 }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                                <div style={{ padding: '0.75rem', background: 'rgba(108, 99, 255, 0.2)', borderRadius: '0.75rem' }}>
-                                                    <Receipt size={24} className="text-primary" />
-                                                </div>
+                                                <div style={{ width: '2.5rem', height: '2.5rem', background: 'rgba(108, 99, 255, 0.15)', borderRadius: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Receipt size={20} className="text-primary" /></div>
                                                 <div>
-                                                    <h4 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 'bold', color: 'var(--primary)' }}>Generate Invoice / Estimate</h4>
-                                                    <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.75rem', color: 'var(--text-dim)' }}>Like a restaurant order - click items to add, adjust quantities easily</p>
+                                                    <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#fff' }}>Integrated Billing</h4>
+                                                    <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-dim)' }}>Select items for invoice</p>
                                                 </div>
                                             </div>
-
-                                            {/* Grand Total Display */}
                                             <div style={{ textAlign: 'right' }}>
-                                                <div style={{ fontSize: '0.625rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 'bold' }}>Total Amount</div>
-                                                <div style={{ fontSize: '2rem', fontWeight: 900, color: '#4ade80', fontFamily: 'monospace' }}>₹{getGrandTotal().toFixed(2)}</div>
-                                                <div style={{ fontSize: '0.625rem', color: 'var(--text-dim)' }}>{invoiceItems.length} items</div>
+                                                <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#4ade80' }}>₹{getGrandTotal().toFixed(2)}</div>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-
-                                        {/* Left Panel - Menu/Quick Add */}
+                                        {/* Panels */}
                                         <div style={{ width: '55%', borderRight: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-
-                                            {/* Tabs */}
-                                            <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '0.5rem' }}>
-                                                {[
-                                                    { id: 'services', label: '🛠️ Services', icon: Wrench },
-                                                    { id: 'parts', label: '🔧 Parts', icon: Package },
-                                                    { id: 'custom', label: '✏️ Custom', icon: Edit2 }
-                                                ].map(tab => (
-                                                    <button
-                                                        key={tab.id}
-                                                        onClick={() => setActiveTab(tab.id)}
-                                                        style={{
-                                                            padding: '0.5rem 1rem',
-                                                            borderRadius: '0.5rem',
-                                                            border: 'none',
-                                                            background: activeTab === tab.id ? 'var(--primary)' : 'rgba(255,255,255,0.05)',
-                                                            color: activeTab === tab.id ? '#fff' : 'var(--text-dim)',
-                                                            fontSize: '0.75rem',
-                                                            fontWeight: 'bold',
-                                                            cursor: 'pointer',
-                                                            transition: 'all 0.2s'
-                                                        }}
-                                                    >
-                                                        {tab.label}
-                                                    </button>
+                                            <div style={{ padding: '1rem', display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+                                                {['services', 'parts', 'custom'].map(t => (
+                                                    <button key={t} onClick={() => setActiveTab(t)} style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid', borderColor: activeTab === t ? 'var(--primary)' : 'rgba(255,255,255,0.05)', background: activeTab === t ? 'var(--primary)' : 'transparent', color: '#fff', fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer' }}>{t.toUpperCase()}</button>
                                                 ))}
                                             </div>
-
-                                            {/* Tab Content - Scrollable */}
                                             <div style={{ flex: 1, overflow: 'auto', padding: '1rem' }}>
-
-                                                {/* Services Tab */}
                                                 {activeTab === 'services' && (
-                                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
-                                                        {SERVICE_PRESETS.map(service => (
-                                                            <button
-                                                                key={service.id}
-                                                                onClick={() => addItem(service)}
-                                                                style={{
-                                                                    padding: '1rem',
-                                                                    background: 'rgba(255,255,255,0.03)',
-                                                                    border: '1px solid rgba(255,255,255,0.08)',
-                                                                    borderRadius: '0.75rem',
-                                                                    cursor: 'pointer',
-                                                                    textAlign: 'left',
-                                                                    transition: 'all 0.2s',
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    gap: '0.75rem'
-                                                                }}
-                                                                onMouseOver={e => { e.currentTarget.style.background = 'rgba(108, 99, 255, 0.15)'; e.currentTarget.style.borderColor = 'var(--primary)'; }}
-                                                                onMouseOut={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
-                                                            >
-                                                                <div style={{ padding: '0.5rem', background: 'rgba(108, 99, 255, 0.2)', borderRadius: '0.5rem' }}>
-                                                                    <service.icon size={16} className="text-primary" />
-                                                                </div>
-                                                                <div style={{ flex: 1 }}>
-                                                                    <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#fff' }}>{service.name}</div>
-                                                                    <div style={{ fontSize: '0.9rem', fontWeight: '900', color: '#4ade80' }}>₹{service.price}</div>
-                                                                </div>
-                                                                <Plus size={16} className="text-primary" style={{ opacity: 0.5 }} />
+                                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                                                        {servicePresets.map(s => (
+                                                            <button key={s.id} onClick={() => addItem(s)} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '0.5rem', color: '#fff', textAlign: 'left', cursor: 'pointer' }}>
+                                                                <div style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>{s.name}</div>
+                                                                <div style={{ fontSize: '0.85rem', color: '#4ade80' }}>₹{s.price}</div>
                                                             </button>
                                                         ))}
                                                     </div>
                                                 )}
-
-                                                {/* Parts Tab */}
                                                 {activeTab === 'parts' && (
-                                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
-                                                        {PARTS_PRESETS.map(part => (
-                                                            <button
-                                                                key={part.id}
-                                                                onClick={() => addItem(part)}
-                                                                style={{
-                                                                    padding: '1rem',
-                                                                    background: 'rgba(255,255,255,0.03)',
-                                                                    border: '1px solid rgba(255,255,255,0.08)',
-                                                                    borderRadius: '0.75rem',
-                                                                    cursor: 'pointer',
-                                                                    textAlign: 'left',
-                                                                    transition: 'all 0.2s',
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    gap: '0.75rem'
-                                                                }}
-                                                                onMouseOver={e => { e.currentTarget.style.background = 'rgba(74, 222, 128, 0.15)'; e.currentTarget.style.borderColor = '#4ade80'; }}
-                                                                onMouseOut={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
-                                                            >
-                                                                <div style={{ padding: '0.5rem', background: 'rgba(74, 222, 128, 0.2)', borderRadius: '0.5rem' }}>
-                                                                    <part.icon size={16} style={{ color: '#4ade80' }} />
-                                                                </div>
-                                                                <div style={{ flex: 1 }}>
-                                                                    <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#fff' }}>{part.name}</div>
-                                                                    <div style={{ fontSize: '0.9rem', fontWeight: '900', color: '#4ade80' }}>₹{part.price}</div>
-                                                                </div>
-                                                                <Plus size={16} style={{ color: '#4ade80', opacity: 0.5 }} />
+                                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                                                        {partsPresets.map(p => (
+                                                            <button key={p.id} onClick={() => addItem(p)} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '0.5rem', color: '#fff', textAlign: 'left', cursor: 'pointer' }}>
+                                                                <div style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>{p.name}</div>
+                                                                <div style={{ fontSize: '0.85rem', color: '#4ade80' }}>₹{p.price}</div>
                                                             </button>
                                                         ))}
                                                     </div>
                                                 )}
-
-                                                {/* Custom Tab */}
                                                 {activeTab === 'custom' && (
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                                        <div>
-                                                            <label style={{ fontSize: '0.625rem', textTransform: 'uppercase', fontWeight: 900, color: 'var(--text-dim)', letterSpacing: '0.1em', marginBottom: '0.5rem', display: 'block' }}>Item Description</label>
-                                                            <input
-                                                                value={customItem.desc}
-                                                                onChange={e => setCustomItem({ ...customItem, desc: e.target.value })}
-                                                                className="input-field"
-                                                                style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem', fontSize: '0.875rem' }}
-                                                                placeholder="e.g., Special Repair, Custom Part, etc."
-                                                            />
+                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                                        <input value={customItem.desc} onChange={e => setCustomItem({...customItem, desc: e.target.value})} className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }} placeholder="Description" />
+                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
+                                                            <input type="number" value={customItem.qty} onChange={e => setCustomItem({...customItem, qty: e.target.value})} className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }} placeholder="Qty" />
+                                                            <select value={customItem.unit} onChange={e => setCustomItem({...customItem, unit: e.target.value})} className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }}><option value="NOS">NOS</option></select>
+                                                            <input type="number" value={customItem.price} onChange={e => setCustomItem({...customItem, price: e.target.value})} className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }} placeholder="Price" />
                                                         </div>
-                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
-                                                            <div>
-                                                                <label style={{ fontSize: '0.625rem', textTransform: 'uppercase', fontWeight: 900, color: 'var(--text-dim)', letterSpacing: '0.1em', marginBottom: '0.5rem', display: 'block' }}>Quantity</label>
-                                                                <input
-                                                                    type="number"
-                                                                    value={customItem.qty}
-                                                                    onChange={e => setCustomItem({ ...customItem, qty: e.target.value })}
-                                                                    className="input-field"
-                                                                    style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem', fontSize: '0.875rem' }}
-                                                                />
-                                                            </div>
-                                                            <div>
-                                                                <label style={{ fontSize: '0.625rem', textTransform: 'uppercase', fontWeight: 900, color: 'var(--text-dim)', letterSpacing: '0.1em', marginBottom: '0.5rem', display: 'block' }}>Unit</label>
-                                                                <select
-                                                                    value={customItem.unit}
-                                                                    onChange={e => setCustomItem({ ...customItem, unit: e.target.value })}
-                                                                    className="input-field"
-                                                                    style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem', fontSize: '0.875rem' }}
-                                                                >
-                                                                    <option value="NOS">NOS</option>
-                                                                    <option value="PCS">PCS</option>
-                                                                    <option value="SET">SET</option>
-                                                                    <option value="PRS">PRS</option>
-                                                                    <option value="MT">Meters</option>
-                                                                    <option value="FT">Feet</option>
-                                                                    <option value="HR">Hours</option>
-                                                                </select>
-                                                            </div>
-                                                            <div>
-                                                                <label style={{ fontSize: '0.625rem', textTransform: 'uppercase', fontWeight: 900, color: 'var(--text-dim)', letterSpacing: '0.1em', marginBottom: '0.5rem', display: 'block' }}>Price (₹)</label>
-                                                                <input
-                                                                    type="number"
-                                                                    value={customItem.price}
-                                                                    onChange={e => setCustomItem({ ...customItem, price: e.target.value })}
-                                                                    className="input-field"
-                                                                    style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem', fontSize: '0.875rem' }}
-                                                                    placeholder="0.00"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <button
-                                                            onClick={addCustomItem}
-                                                            className="btn-primary"
-                                                            style={{ padding: '0.75rem 1.5rem', borderRadius: '0.5rem', fontSize: '0.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-                                                        >
-                                                            <Plus size={18} /> Add Custom Item
-                                                        </button>
+                                                        <button onClick={addCustomItem} className="btn-primary" style={{ padding: '0.75rem', borderRadius: '0.5rem' }}>Add Item</button>
                                                     </div>
                                                 )}
                                             </div>
                                         </div>
-
-                                        {/* Right Panel - Current Order */}
                                         <div style={{ width: '45%', display: 'flex', flexDirection: 'column', background: 'rgba(0,0,0,0.2)' }}>
-
-                                            {/* Order Header */}
-                                            <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                                <ShoppingCart size={20} className="text-primary" />
-                                                <span style={{ fontWeight: 'bold', fontSize: '0.875rem' }}>Current Bill</span>
-                                                <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--text-dim)', background: 'rgba(255,255,255,0.05)', padding: '0.25rem 0.5rem', borderRadius: '0.25rem' }}>{invoiceItems.length} items</span>
-                                            </div>
-
-                                            {/* Order Items - Scrollable */}
+                                            <div style={{ padding: '1rem', borderBottom: '1px solid rgba(255,255,255,0.05)', fontWeight: 'bold' }}>Bill ({invoiceItems.length})</div>
                                             <div style={{ flex: 1, overflow: 'auto', padding: '1rem' }}>
-                                                {invoiceItems.length === 0 ? (
-                                                    <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-dim)' }}>
-                                                        <ShoppingCart size={48} style={{ opacity: 0.3, marginBottom: '1rem' }} />
-                                                        <p style={{ fontSize: '0.875rem', margin: 0 }}>No items added yet</p>
-                                                        <p style={{ fontSize: '0.75rem', margin: '0.5rem 0 0 0', opacity: 0.7 }}>Click items from the menu to add</p>
-                                                    </div>
-                                                ) : (
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                                        {invoiceItems.map((item, index) => (
-                                                            <motion.div
-                                                                key={index}
-                                                                initial={{ opacity: 0, x: 20 }}
-                                                                animate={{ opacity: 1, x: 0 }}
-                                                                style={{
-                                                                    background: 'rgba(255,255,255,0.03)',
-                                                                    border: '1px solid rgba(255,255,255,0.05)',
-                                                                    borderRadius: '0.75rem',
-                                                                    padding: '0.75rem',
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    gap: '0.75rem'
-                                                                }}
+                                                {existingInvoice && (
+                                                    <div style={{
+                                                        marginBottom: '1rem',
+                                                        padding: '1rem',
+                                                        borderRadius: '0.75rem',
+                                                        background: 'rgba(74, 222, 128, 0.1)',
+                                                        border: '1px solid rgba(74, 222, 128, 0.2)',
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        gap: '0.5rem'
+                                                    }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <span style={{ fontSize: '0.625rem', textTransform: 'uppercase', fontWeight: 900, color: '#4ade80', letterSpacing: '0.1em' }}>Existing Invoice</span>
+                                                            <div style={{ padding: '0.25rem 0.5rem', borderRadius: '0.25rem', background: '#4ade80', color: '#000', fontSize: '0.625rem', fontWeight: 900 }}>{existingInvoice.status || 'UNPAID'}</div>
+                                                        </div>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <span style={{ fontSize: '0.875rem', fontWeight: 'bold', color: '#fff' }}>{existingInvoice.invoiceNumber}</span>
+                                                            <button 
+                                                                onClick={() => window.open(`/api/admin/invoices/download/${existingInvoice.id}`, '_blank')}
+                                                                style={{ padding: '0.4rem 0.8rem', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '0.5rem', color: '#fff', fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
                                                             >
-                                                                <div style={{ flex: 1, minWidth: 0 }}>
-                                                                    <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.desc}</div>
-                                                                    <div style={{ fontSize: '0.65rem', color: 'var(--text-dim)' }}>₹{item.price.toFixed(2)} × {item.qty} {item.unit}</div>
-                                                                </div>
-
-                                                                {/* Quantity Controls */}
-                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                                                    <button
-                                                                        onClick={() => updateItemQty(index, item.qty - 1)}
-                                                                        style={{ padding: '0.25rem', background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '0.25rem', cursor: 'pointer', color: 'var(--text-dim)' }}
-                                                                    >
-                                                                        <Minus size={12} />
-                                                                    </button>
-                                                                    <input
-                                                                        type="number"
-                                                                        value={item.qty}
-                                                                        onChange={e => updateItemQty(index, e.target.value)}
-                                                                        style={{ width: '40px', padding: '0.25rem', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0.25rem', color: '#fff', textAlign: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}
-                                                                    />
-                                                                    <button
-                                                                        onClick={() => updateItemQty(index, item.qty + 1)}
-                                                                        style={{ padding: '0.25rem', background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '0.25rem', cursor: 'pointer', color: 'var(--text-dim)' }}
-                                                                    >
-                                                                        <Plus size={12} />
-                                                                    </button>
-                                                                </div>
-
-                                                                <div style={{ width: '70px', textAlign: 'right' }}>
-                                                                    <div style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#4ade80' }}>₹{getItemTotal(item).toFixed(2)}</div>
-                                                                </div>
-
-                                                                <button
-                                                                    onClick={() => removeItem(index)}
-                                                                    style={{ padding: '0.25rem', background: 'rgba(255, 101, 132, 0.1)', border: 'none', borderRadius: '0.25rem', cursor: 'pointer', color: 'var(--secondary)' }}
-                                                                >
-                                                                    <X size={14} />
-                                                                </button>
-                                                            </motion.div>
-                                                        ))}
+                                                                <Download size={14} /> Download
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 )}
-                                            </div>
 
-                                            {/* Order Summary & Actions */}
-                                            {invoiceItems.length > 0 && (
-                                                <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', background: 'rgba(0,0,0,0.3)' }}>
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                                        <span style={{ fontSize: '0.875rem', color: 'var(--text-dim)' }}>Subtotal</span>
-                                                        <span style={{ fontSize: '1rem', fontWeight: 'bold', color: '#fff' }}>₹{getGrandTotal().toFixed(2)}</span>
+                                                {invoiceItems.map((item, index) => (
+                                                    <div key={index} style={{ background: 'rgba(255,255,255,0.03)', padding: '0.75rem', borderRadius: '0.5rem', marginBottom: '0.5rem', display: 'flex', justifyContent: 'space-between' }}>
+                                                        <div>
+                                                            <div style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>{item.desc}</div>
+                                                            <div style={{ fontSize: '0.65rem', color: 'var(--text-dim)' }}>₹{item.price} x {item.qty}</div>
+                                                        </div>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                            <button onClick={() => removeItem(index)} style={{ color: 'var(--secondary)', border: 'none', background: 'transparent' }}><X size={12} /></button>
+                                                            <div style={{ fontWeight: 'bold', color: '#4ade80' }}>₹{getItemTotal(item)}</div>
+                                                        </div>
                                                     </div>
-
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                                        <button
-                                                            onClick={generateAndDownloadPDF}
+                                                ))}
+                                            </div>
+                                            {invoiceItems.length > 0 && (
+                                                <div style={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                                    {session && (session.role === 'admin' || session.role === 'agent') && (
+                                                        <div style={{ padding: '0.75rem', borderRadius: '0.5rem', background: 'rgba(108, 99, 255, 0.1)', border: '1px solid rgba(108, 99, 255, 0.2)', fontSize: '0.7rem', color: 'var(--primary)', textAlign: 'center', fontWeight: 'bold' }}>
+                                                            Generations by Admin/Agent require Superadmin approval.
+                                                        </div>
+                                                    )}
+                                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                        <button 
+                                                            onClick={generateAndDownloadPDF} 
                                                             disabled={generatingInvoice}
-                                                            style={{ width: '100%', padding: '0.875rem', background: 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)', color: '#000', border: 'none', borderRadius: '0.5rem', fontWeight: 'bold', fontSize: '0.875rem', cursor: generatingInvoice ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', opacity: generatingInvoice ? 0.7 : 1 }}
+                                                            style={{ flex: 1, padding: '0.75rem', background: '#4ade80', color: '#000', borderRadius: '0.5rem', fontWeight: 'bold', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', opacity: generatingInvoice ? 0.7 : 1 }}
                                                         >
-                                                            {generatingInvoice ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <Download size={18} />}
-                                                            Generate & Download PDF
+                                                            {generatingInvoice ? <Loader2 size={16} className="animate-spin" /> : <FileText size={16} />}
+                                                            {existingInvoice ? 'Update & Download' : 'Generate PDF'}
                                                         </button>
-
-                                                        <button
-                                                            onClick={sendInvoiceToCustomer}
+                                                        <button 
+                                                            onClick={sendInvoiceToCustomer} 
                                                             disabled={generatingInvoice}
-                                                            style={{ width: '100%', padding: '0.875rem', background: 'linear-gradient(135deg, var(--primary) 0%, #8B83FF 100%)', color: '#fff', border: 'none', borderRadius: '0.5rem', fontWeight: 'bold', fontSize: '0.875rem', cursor: generatingInvoice ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', opacity: generatingInvoice ? 0.7 : 1 }}
+                                                            style={{ flex: 1, padding: '0.75rem', background: 'var(--primary)', color: '#fff', borderRadius: '0.5rem', fontWeight: 'bold', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', opacity: generatingInvoice ? 0.7 : 1 }}
                                                         >
-                                                            {generatingInvoice ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <Mail size={18} />}
-                                                            Send to Customer Email
+                                                            {generatingInvoice ? <Loader2 size={16} className="animate-spin" /> : <Mail size={16} />}
+                                                            Email Bill
                                                         </button>
                                                     </div>
                                                 </div>
@@ -852,40 +711,16 @@ export default function TicketManagement() {
                                 </div>
                             </div>
 
-                            {/* Modal Footer */}
-                            <div style={{ padding: '1.5rem', borderTop: '1px solid var(--border-glass)', background: 'rgba(0,0,0,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.875rem', color: 'var(--text-dim)' }}>
-                                    <input
-                                        type="checkbox"
-                                        checked={sendEmailChecked}
-                                        onChange={e => setSendEmailChecked(e.target.checked)}
-                                        style={{ width: '16px', height: '16px', accentColor: 'var(--primary)' }}
-                                    />
-                                    Auto-send invoice when ticket is closed
+                            {/* Pane Footer */}
+                            <div style={{ padding: '1.5rem 2.5rem', borderTop: '1px solid var(--border-glass)', background: 'rgba(0,0,0,0.4)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', fontSize: '0.875rem', color: 'var(--text-dim)' }}>
+                                    <input type="checkbox" checked={sendEmailChecked} onChange={e => setSendEmailChecked(e.target.checked)} style={{ width: '18px', height: '18px', accentColor: 'var(--primary)' }} />
+                                    Auto-send invoice
                                 </label>
-
                                 <div style={{ display: 'flex', gap: '1rem' }}>
-                                    <button
-                                        onClick={() => setIsModalOpen(false)}
-                                        style={{ padding: '0.75rem 1.5rem', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0.75rem', fontWeight: 'bold', fontSize: '0.875rem', color: 'var(--text-dim)', background: 'transparent', cursor: 'pointer', transition: 'all 0.2s' }}
-                                        onMouseOver={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#fff' }}
-                                        onMouseOut={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-dim)' }}
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            const s = document.getElementById('status-select').value;
-                                            const a = document.getElementById('assign-select').value;
-                                            const c = document.getElementById('comments-textarea').value;
-                                            updateTicketDetails(selectedTicket.id, s, c, a);
-                                        }}
-                                        disabled={updateLoading}
-                                        className="btn-primary"
-                                        style={{ padding: '0.75rem 2rem', borderRadius: '0.75rem', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                                    >
-                                        {updateLoading ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <Send size={16} />}
-                                        Save Updates
+                                    <button onClick={() => setIsModalOpen(false)} style={{ padding: '0.75rem 1.5rem', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '1rem', color: 'var(--text-dim)', background: 'transparent' }}>Cancel</button>
+                                    <button onClick={() => { const s = document.getElementById('status-select').value; const a = document.getElementById('assign-select').value; const c = document.getElementById('comments-textarea').value; updateTicketDetails(selectedTicket.id, s, c, a); }} disabled={updateLoading} className="btn-primary" style={{ padding: '0.75rem 2rem', borderRadius: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        {updateLoading ? <Loader2 size={16} /> : <Send size={16} />} Update
                                     </button>
                                 </div>
                             </div>

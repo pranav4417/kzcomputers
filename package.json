@@ -34,5 +34,8 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "sqlite3": "^5.1.7"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.cjs"
   }
 }

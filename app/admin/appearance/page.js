@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Palette, Share2, Type, Sun, Moon, Save, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 export default function AppearanceManagement() {
+    const router = useRouter();
     const [config, setConfig] = useState({
         primary: '#6c63ff',
         secondary: '#ff6584',
@@ -12,6 +14,17 @@ export default function AppearanceManagement() {
         mode: 'dark'
     });
     const [saving, setSaving] = useState(false);
+
+    useEffect(() => {
+        const checkRole = async () => {
+            const res = await fetch('/api/auth/session-check');
+            const data = await res.json();
+            if (!data.user || data.user.role?.toLowerCase() !== 'superadmin') {
+                router.push('/admin');
+            }
+        };
+        checkRole();
+    }, []);
 
     const handleSave = () => {
         setSaving(true);

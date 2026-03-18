@@ -2,15 +2,26 @@
 
 import React, { useState, useEffect } from 'react';
 import { Shield, CheckCircle, XCircle, Clock, Loader2, AlertTriangle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function ApprovalsPage() {
+    const router = useRouter();
     const [updates, setUpdates] = useState([]);
     const [loading, setLoading] = useState(true);
     const [processing, setProcessing] = useState(null);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        fetchUpdates();
+        const checkRole = async () => {
+            const res = await fetch('/api/auth/session-check');
+            const data = await res.json();
+            if (!data.user || data.user.role?.toLowerCase() !== 'superadmin') {
+                router.push('/admin');
+                return;
+            }
+            fetchUpdates();
+        };
+        checkRole();
     }, []);
 
     const fetchUpdates = async () => {

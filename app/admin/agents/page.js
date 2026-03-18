@@ -121,7 +121,7 @@ export default function AgentManagement() {
                                     <h3 style={{ margin: 0, fontWeight: 'bold', fontSize: '1rem' }}>{agent.username}</h3>
                                     {agent.role === 'admin' && <Shield size={12} className="text-secondary" />}
                                 </div>
-                                <p className="text-primary" style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 'black', margin: 0 }}>{agent.role === 'admin' ? 'Super Admin' : agent.role}</p>
+                                <p className="text-primary" style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 'black', margin: 0 }}>{(agent.role === 'admin' || agent.role === 'superadmin') ? 'Super Admin' : agent.role}</p>
                                 <p className="text-dim" style={{ fontSize: '0.65rem', margin: '0.5rem 0 0 0', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{agent.email}</p>
                             </div>
                             <div style={{ padding: '0.25rem 0.5rem', borderRadius: '1rem', fontSize: '0.5rem', fontWeight: 'black', textTransform: 'uppercase', background: agent.status === 'active' ? 'rgba(52, 199, 89, 0.1)' : 'rgba(255, 193, 7, 0.1)', color: agent.status === 'active' ? '#62e57e' : '#ffc107', position: 'absolute', bottom: '1.5rem', right: '1.5rem' }}>
@@ -141,7 +141,10 @@ export default function AgentManagement() {
                                 </button>
                             )}
 
-                            {agent.role !== 'admin' && currentUser?.role === 'superadmin' && (
+                            {agent.role?.toLowerCase() !== 'admin' && 
+                             agent.role?.toLowerCase() !== 'superadmin' && 
+                             String(agent.id) !== String(currentUser?.id) && 
+                             currentUser?.role?.toLowerCase() === 'superadmin' && (
                                 <button
                                     onClick={() => handleDeleteAgent(agent.id)}
                                     className="md:opacity-0 md:group-hover:opacity-100"

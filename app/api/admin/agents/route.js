@@ -86,12 +86,27 @@ export async function DELETE(req) {
             return NextResponse.json({ error: 'Agent ID is required' }, { status: 400 });
         }
 
-        // Prevent deleting the last admin
-        const adminCount = await prisma.admin.count({ where: { role: 'admin' } });
         const targetAgent = await prisma.admin.findUnique({ where: { id: parseInt(id) } });
 
-        if (targetAgent?.role === 'admin' && adminCount <= 1) {
-            return NextResponse.json({ error: 'Cannot delete the last admin account.' }, { status: 400 });
+        if (!targetAgent) {
+            return NextResponse.json({ error: 'Staff member not found' }, { status: 404 });
+        }
+
+        // 🛡️ Security Checks
+        if (targetAgent.id === session.id) {
+            return NextResponse.json({ error: 'You cannot delete your own account' }, { status: 400 });
+        }
+
+        if (targetAgent.role === 'superadmin') {
+            return NextResponse.json({ error: 'Super Admin accounts cannot be deleted' }, { status: 400 });
+        }
+
+        // Prevent deleting the last admin
+        if (targetAgent.role === 'admin') {
+            const adminCount = await prisma.admin.count({ where: { role: 'admin' } });
+            if (adminCount <= 1) {
+                return NextResponse.json({ error: 'At least one Admin account must remain' }, { status: 400 });
+            }
         }
 
         await prisma.admin.delete({
