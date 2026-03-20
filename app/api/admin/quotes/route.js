@@ -4,14 +4,6 @@ import { requireAuth, getSession } from '@/lib/auth';
 import { generateQuotePDFBuffer } from '@/lib/pdfGenerator';
 import { sendQuoteEmail } from '@/lib/email';
 
-// Get the correct base path for saving files
-function getPublicDir() {
-    return path.join(process.cwd(), 'public');
-}
-
-import fs from 'fs';
-import path from 'path';
-
 export async function POST(req) {
     try {
         const body = await req.json();
@@ -71,23 +63,16 @@ export async function POST(req) {
         // Generate PDF
         const pdfBuffer = generateQuotePDFBuffer(quote, { customerName, email: customerEmail, phone: customerPhone }, parsedItems);
 
-        // Save PDF to public folder
-        const publicDir = getPublicDir();
-        const quotesDir = path.join(publicDir, 'quotes');
-        if (!fs.existsSync(quotesDir)) {
-            fs.mkdirSync(quotesDir, { recursive: true });
-        }
-
-        const pdfFileName = `QUOTE-${quoteToken}.pdf`;
-        const pdfPath = path.join(quotesDir, pdfFileName);
-        fs.writeFileSync(pdfPath, pdfBuffer);
-
+        // Note: Vercel has read-only filesystem, so we can't save PDFs to disk
+        // Instead, we'll generate PDF on-demand or attach to email
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-        const pdfUrl = `${baseUrl}/quotes/${pdfFileName}`;
 
-        // Send email to customer
+        // Generate PDF URL for download (will be generated on-the-fly)
+        const pdfUrl = `${baseUrl}/api/quotes/pdf/${quoteToken}`;
+
+        // Send email to customer with PDF attached
         const quoteUrl = `${baseUrl}/quote/${quoteToken}`;
-        await sendQuoteEmail(customerEmail, customerName, quote, pdfUrl, quoteUrl);
+        await sendQuoteEmail(customerEmail, customerName, quote, pdfUrl, quoteUrl, pdfBuffer);
 
         return NextResponse.json({
             success: true,
