@@ -65,7 +65,7 @@ export async function POST(req) {
 
         // Note: Vercel has read-only filesystem, so we can't save PDFs to disk
         // Instead, we'll generate PDF on-demand or attach to email
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://suraksha-wb.vercel.app';
 
         // Generate PDF URL for download (will be generated on-the-fly)
         const pdfUrl = `${baseUrl}/api/quotes/pdf/${quoteToken}`;
