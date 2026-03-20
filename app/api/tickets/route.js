@@ -81,7 +81,7 @@ export async function POST(req) {
         });
 
         // 4. Send Email
-        const ticketLink = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/track/${ticketToken}`;
+        const ticketLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://suraksha-wb.vercel.app'}/track/${ticketToken}`;
         await sendTicketEmail(email, {
             ticketNumber,
             customerName,

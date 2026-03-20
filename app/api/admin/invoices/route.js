@@ -98,7 +98,7 @@ export async function POST(req) {
         // Send email if requested
         if (shouldSendEmail) {
             try {
-                const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+                const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://suraksha-wb.vercel.app';
                 await sendInvoiceEmail(ticket.email, {
                     invoiceNumber: invoice.invoiceNumber,
                     ticketNumber: ticket.ticketNumber,

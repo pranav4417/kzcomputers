@@ -96,7 +96,7 @@ export async function PATCH(req, { params }) {
                     // Send invoice email if requested
                     if (shouldSendInvoice || status === 'Closed') {
                         try {
-                            const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+                            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://suraksha-wb.vercel.app';
                             await sendInvoiceEmail(ticket.email, {
                                 invoiceNumber: generatedInvoice.invoiceNumber,
                                 ticketNumber: ticket.ticketNumber,
@@ -139,7 +139,7 @@ export async function PATCH(req, { params }) {
                     status: ticket.status,
                     subject: ticket.subject,
                     description: ticket.description,
-                    ticketLink: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/track/${ticket.ticketToken}`,
+                    ticketLink: `${process.env.NEXT_PUBLIC_APP_URL || 'https://suraksha-wb.vercel.app'}/track/${ticket.ticketToken}`,
                     isUpdate: true
                 });
             } catch (e) {
