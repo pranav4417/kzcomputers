@@ -29,7 +29,7 @@ export async function GET(req, { params }) {
         // It's better to verify user or token.
         // Wait, previously `/invoices/EST-2024-TIMESTAMP.pdf` was served statically. Since the token was the timestamp, it was hard to guess.
         // What if we use `invoiceNumber` (e.g., "EST-2024-TIMESTAMP") instead of `id` for the lookup? That's much more secure for dynamic unauthenticated downloads.
-        
+
         let items = [];
         try {
             items = typeof invoice.items === 'string' ? JSON.parse(invoice.items) : invoice.items;
@@ -37,7 +37,7 @@ export async function GET(req, { params }) {
             items = [];
         }
 
-        const pdfBuffer = generateInvoicePDFBuffer(invoice, invoice.ticket, items);
+        const pdfBuffer = generateInvoicePDFBuffer(invoice, invoice.ticket, items, invoice.excludingGst || false);
 
         // Return the raw buffer as a PDF file
         return new NextResponse(pdfBuffer, {

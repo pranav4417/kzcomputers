@@ -29,6 +29,7 @@ export default function TicketManagement() {
     const [generatingInvoice, setGeneratingInvoice] = useState(false);
     const [sendEmailChecked, setSendEmailChecked] = useState(true);
     const [existingInvoice, setExistingInvoice] = useState(null);
+    const [excludingGst, setExcludingGst] = useState(false);
 
     const [servicePresets, setServicePresets] = useState([]);
     const [partsPresets, setPartsPresets] = useState([]);
@@ -221,7 +222,8 @@ export default function TicketManagement() {
                     ticketId: selectedTicket.id,
                     amount: getGrandTotal(),
                     items: invoiceItems,
-                    status: 'Unpaid'
+                    status: 'Unpaid',
+                    excludingGst
                 })
             });
             const data = await res.json();
@@ -285,7 +287,8 @@ export default function TicketManagement() {
                     amount: getGrandTotal(),
                     items: invoiceItems,
                     status: 'Unpaid',
-                    sendEmail: true
+                    sendEmail: true,
+                    excludingGst
                 })
             });
             const data = await res.json();
@@ -310,6 +313,42 @@ export default function TicketManagement() {
             }
         } catch (e) {
             alert('Error sending invoice: ' + e.message);
+        }
+        setGeneratingInvoice(false);
+    };
+
+    const sendQuoteToCustomer = async () => {
+        if (invoiceItems.length === 0) {
+            alert('Please add items first');
+            return;
+        }
+        if (!selectedTicket?.email || !selectedTicket?.customerName) {
+            alert('Ticket missing customer email or name');
+            return;
+        }
+
+        setGeneratingInvoice(true);
+        try {
+            const res = await fetch('/api/admin/quotes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    customerEmail: selectedTicket.email,
+                    customerName: selectedTicket.customerName,
+                    customerPhone: selectedTicket.phone,
+                    items: invoiceItems,
+                    amount: getGrandTotal(),
+                    ticketId: selectedTicket.id
+                })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert(`📧 Quote sent to ${selectedTicket.email}! Customer can now Accept or Reject the quote.`);
+            } else {
+                alert(data.error || 'Failed to send quote');
+            }
+        } catch (e) {
+            alert('Error sending quote: ' + e.message);
         }
         setGeneratingInvoice(false);
     };
@@ -663,6 +702,10 @@ export default function TicketManagement() {
                                                             <select value={customItem.unit} onChange={e => setCustomItem({ ...customItem, unit: e.target.value })} className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }}><option value="NOS">NOS</option></select>
                                                             <input type="number" value={customItem.price} onChange={e => setCustomItem({ ...customItem, price: e.target.value })} className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }} placeholder="Price" />
                                                         </div>
+                                                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: '#fff', fontSize: '0.875rem' }}>
+                                                            <input type="checkbox" checked={excludingGst} onChange={e => setExcludingGst(e.target.checked)} style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
+                                                            Excluding GST
+                                                        </label>
                                                         <button onClick={addCustomItem} className="btn-primary" style={{ padding: '0.75rem', borderRadius: '0.5rem' }}>Add Item</button>
                                                     </div>
                                                 )}
@@ -736,6 +779,16 @@ export default function TicketManagement() {
                                                             Email Bill
                                                         </button>
                                                     </div>
+                                                    {invoiceItems.length > 0 && (
+                                                        <button
+                                                            onClick={sendQuoteToCustomer}
+                                                            disabled={generatingInvoice}
+                                                            style={{ width: '100%', padding: '0.75rem', background: 'transparent', color: '#ffc107', borderRadius: '0.5rem', fontWeight: 'bold', border: '1px solid #ffc107', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', opacity: generatingInvoice ? 0.7 : 1 }}
+                                                        >
+                                                            {generatingInvoice ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                                                            Send Quote (Customer Can Accept/Reject)
+                                                        </button>
+                                                    )}
                                                 </div>
                                             )}
                                         </div>

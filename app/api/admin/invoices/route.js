@@ -15,7 +15,7 @@ function getPublicDir() {
 export async function POST(req) {
     try {
         const body = await req.json();
-        const { ticketId, amount, status, items, sendEmail: shouldSendEmail } = body;
+        const { ticketId, amount, status, items, sendEmail: shouldSendEmail, excludingGst } = body;
 
         const session = await getSession();
         if (!session || !['admin', 'agent', 'superadmin'].includes(session.role)) {
@@ -72,12 +72,13 @@ export async function POST(req) {
                 status: status || 'Unpaid',
                 ticketId: parseInt(ticketId),
                 generatedBy: session?.username || session?.email || 'Admin',
-                items: JSON.stringify(parsedItems)
+                items: JSON.stringify(parsedItems),
+                excludingGst: excludingGst || false
             }
         });
 
         // Generate PDF
-        const pdfBuffer = generateInvoicePDFBuffer(invoice, ticket, parsedItems);
+        const pdfBuffer = generateInvoicePDFBuffer(invoice, ticket, parsedItems, excludingGst);
 
         // Save PDF to public folder for direct access
         // Instead of saving to public (which fails on Vercel), we return it as base64

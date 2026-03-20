@@ -48,7 +48,13 @@ export async function GET(req) {
             include: { product: true },
             orderBy: { createdAt: 'desc' }
         });
-        return NextResponse.json(quotes);
+
+        // Parse items JSON for each quote
+        const quotesWithItems = quotes.map(quote => ({
+            ...quote,
+            items: quote.items ? (typeof quote.items === 'string' ? JSON.parse(quote.items) : quote.items) : []
+        }));
+        return NextResponse.json(quotesWithItems);
     } catch (err) {
         console.error("Quote fetch error:", err);
         return NextResponse.json({ error: 'Failed to fetch quotes' }, { status: 500 });

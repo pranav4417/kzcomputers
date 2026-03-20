@@ -61,6 +61,7 @@ model Ticket {
 
   updates      TicketUpdate[]
   invoices     Invoice[]
+  quotes       QuoteRequest[] @relation("TicketQuotes")
 
   @@map("tickets")
 }
@@ -87,6 +88,7 @@ model Invoice {
   pdfUrl       String?   @map("pdf_url")
   items        String?   // JSON string for line items
   generatedBy  String?   @map("generated_by")
+  excludingGst Boolean   @default(false) @map("excluding_gst")
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
 
@@ -110,15 +112,23 @@ model Product {
 model QuoteRequest {
   id          Int      @id @default(autoincrement())
   customerId  Int?     @map("customer_id")
-  productId   Int      @map("product_id")
+  productId   Int?     @map("product_id")
+  ticketId    Int?     @map("ticket_id")
   guestEmail  String?  @map("guest_email")
   guestPhone  String?  @map("guest_phone")
+  customerName String? @map("customer_name")
   message     String?
-  status      String   @default("Pending") // Pending, Reviewed, Sent
+  items       String?  // JSON string for quote line items
+  amount      Float?   @default(0)
+  status      String   @default("Pending") // Pending, Sent, Accepted, Rejected
+  quoteToken  String?  @map("quote_token")
+  sentAt      DateTime? @map("sent_at")
+  respondedAt DateTime? @map("responded_at")
   createdAt   DateTime @default(now()) @map("created_at")
 
   customer    Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
-  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product     Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  ticket      Ticket?   @relation("TicketQuotes", fields: [ticketId], references: [id], onDelete: SetNull)
 
   @@map("quote_requests")
 }
