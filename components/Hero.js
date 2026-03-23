@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Shield, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
 
 export default function Hero() {
     return (
@@ -45,12 +46,12 @@ export default function Hero() {
                     transition={{ delay: 0.6, duration: 0.8 }}
                     className="flex flex-col md:flex-row items-center justify-center gap-4"
                 >
-                    <button className="btn-primary">
+                    <Link href="/raise-ticket" className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
                         Get Started Now <ChevronRight size={20} />
-                    </button>
-                    <button className="btn-secondary">
+                    </Link>
+                    <Link href="/track" className="btn-secondary" style={{ textDecoration: 'none' }}>
                         Track Your Status
-                    </button>
+                    </Link>
                 </motion.div>
             </div>
 

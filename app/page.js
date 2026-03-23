@@ -4,14 +4,17 @@ import Hero from '@/components/Hero';
 import ServicesGrid from '@/components/ServicesGrid';
 import ProductsGrid from '@/components/ProductsGrid';
 import Footer from '@/components/Footer';
+import prisma from '@/lib/prisma';
 
-export default function Home() {
+export default async function Home() {
+  const services = await prisma.service.findMany();
+
   return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       <Hero />
       <div className="relative">
-        <ServicesGrid />
+        <ServicesGrid services={services} />
         <ProductsGrid />
 
         {/* About Section - Brief */}

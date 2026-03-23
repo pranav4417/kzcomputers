@@ -21,10 +21,10 @@ export async function POST(req) {
         const quoteRequest = await prisma.quoteRequest.create({
             data: {
                 customerName,
-                email,
-                phone: phone || '',
-                notes: notes || '',
-                status: 'New',
+                guestEmail: email,
+                guestPhone: phone || '',
+                message: notes || '',
+                status: 'Pending',
                 productId: parseInt(productId)
             }
         });
