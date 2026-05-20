@@ -8,7 +8,7 @@ import { redirect } from 'next/navigation';
 import { Ticket, Clock, CheckCircle2, Package } from 'lucide-react';
 import Link from 'next/link';
 
-export default async function CustomerDashboard() {
+export default async function CustomerDashboard({ searchParams }) {
     const session = await getSession();
 
     if (!session || session.role !== 'customer') {
@@ -20,7 +20,7 @@ export default async function CustomerDashboard() {
         select: { name: true }
     });
 
-    const tickets = await prisma.ticket.findMany({
+    const allTickets = await prisma.ticket.findMany({
         where: { email: session.email },
         orderBy: { createdAt: 'desc' },
         include: {
@@ -32,10 +32,15 @@ export default async function CustomerDashboard() {
     });
 
     const stats = {
-        total: tickets.length,
-        open: tickets.filter(t => t.status === 'Open').length,
-        completed: tickets.filter(t => t.status === 'Completed').length,
+        total: allTickets.length,
+        open: allTickets.filter(t => t.status === 'Open').length,
+        completed: allTickets.filter(t => t.status === 'Completed').length,
     };
+
+    const statusFilter = searchParams.status;
+    const tickets = statusFilter
+        ? allTickets.filter(ticket => ticket.status === statusFilter)
+        : allTickets;
 
     return (
         <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -65,18 +70,24 @@ export default async function CustomerDashboard() {
 
                 {/* Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                    <div className="glass p-8 flex items-center gap-6 glass-hover delay-0 animate-fade-in">
-                        <div style={{ padding: '1rem', background: 'rgba(108, 99, 255, 0.1)', borderRadius: '1rem' }}><Ticket size={24} className="text-primary" /></div>
-                        <div><div className="title-md m-0">{stats.total}</div><div className="text-dim" style={{ fontSize: '0.65rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Total Tickets</div></div>
-                    </div>
-                    <div className="glass p-8 flex items-center gap-6 glass-hover delay-1 animate-fade-in">
-                        <div style={{ padding: '1rem', background: 'rgba(255, 193, 7, 0.1)', borderRadius: '1rem' }}><Clock size={24} style={{ color: '#ffc107' }} /></div>
-                        <div><div className="title-md m-0">{stats.open}</div><div className="text-dim" style={{ fontSize: '0.65rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Active Requests</div></div>
-                    </div>
-                    <div className="glass p-8 flex items-center gap-6 glass-hover delay-2 animate-fade-in">
-                        <div style={{ padding: '1rem', background: 'rgba(40, 167, 69, 0.1)', borderRadius: '1rem' }}><CheckCircle2 size={24} style={{ color: '#28a745' }} /></div>
-                        <div><div className="title-md m-0">{stats.completed}</div><div className="text-dim" style={{ fontSize: '0.65rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Fixed & Closed</div></div>
-                    </div>
+                    <Link key="total" href="/dashboard" className="block">
+                        <div className="glass p-8 flex items-center gap-6 glass-hover delay-0 animate-fade-in">
+                            <div style={{ padding: '1rem', background: 'rgba(108, 99, 255, 0.1)', borderRadius: '1rem' }}><Ticket size={24} className="text-primary" /></div>
+                            <div><div className="title-md m-0">{stats.total}</div><div className="text-dim" style={{ fontSize: '0.65rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Total Tickets</div></div>
+                        </div>
+                    </Link>
+                    <Link key="open" href="/dashboard?status=Open" className="block">
+                        <div className="glass p-8 flex items-center gap-6 glass-hover delay-1 animate-fade-in">
+                            <div style={{ padding: '1rem', background: 'rgba(255, 193, 7, 0.1)', borderRadius: '1rem' }}><Clock size={24} style={{ color: '#ffc107' }} /></div>
+                            <div><div className="title-md m-0">{stats.open}</div><div className="text-dim" style={{ fontSize: '0.65rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Active Requests</div></div>
+                        </div>
+                    </Link>
+                    <Link key="completed" href="/dashboard?status=Completed" className="block">
+                        <div className="glass p-8 flex items-center gap-6 glass-hover delay-2 animate-fade-in">
+                            <div style={{ padding: '1rem', background: 'rgba(40, 167, 69, 0.1)', borderRadius: '1rem' }}><CheckCircle2 size={24} style={{ color: '#28a745' }} /></div>
+                            <div><div className="title-md m-0">{stats.completed}</div><div className="text-dim" style={{ fontSize: '0.65rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Fixed & Closed</div></div>
+                        </div>
+                    </Link>
                 </div>
 
                 {/* Tickets List */}

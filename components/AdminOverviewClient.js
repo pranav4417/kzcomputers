@@ -5,6 +5,7 @@ import {
     Ticket, CheckCircle2, Clock, AlertCircle, ShoppingBag, TrendingUp, ArrowUpRight, Download
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import ExportModal from '@/components/ExportModal';
 
 export default function AdminOverviewClient({ stats, recentTickets }) {
@@ -67,18 +68,35 @@ export default function AdminOverviewClient({ stats, recentTickets }) {
 
                 {/* Stat Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {cards.map((card, idx) => (
-                        <div key={card.name} className={`glass glass-hover p-8 relative overflow-hidden delay-${idx % 4}`}>
-                            <div className="flex justify-between items-start mb-4">
-                                <div style={{ padding: '0.75rem', borderRadius: '0.75rem', background: 'rgba(255,255,255,0.05)', color: card.color }}>
-                                    <card.icon size={24} />
+                    {cards.map((card, idx) => {
+                        let href = '/admin/tickets';
+                        if (card.name === 'Total Tickets' || card.name === 'Assigned Tickets') {
+                            href = '/admin/tickets';
+                        } else if (card.name === 'Open Queries' || card.name === 'Active Repairs') {
+                            href = '/admin/tickets?status=Open';
+                        } else if (card.name === 'Fixed Today' || card.name === 'Completed Tasks') {
+                            href = '/admin/tickets?status=Completed';
+                        } else if (card.name === 'Urgent Tickets') {
+                            href = '/admin/tickets?priority=High';
+                        } else if (card.name === 'Products Live') {
+                            href = '/admin/products';
+                        }
+
+                        return (
+                            <Link key={card.name} href={href} className="block">
+                                <div key={card.name} className={`glass glass-hover p-8 relative overflow-hidden delay-${idx % 4}`}>
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div style={{ padding: '0.75rem', borderRadius: '0.75rem', background: 'rgba(255,255,255,0.05)', color: card.color }}>
+                                            <card.icon size={24} />
+                                        </div>
+                                        <TrendingUp size={16} className="text-dim" />
+                                    </div>
+                                    <h3 className="title-lg m-0">{card.value}</h3>
+                                    <p className="text-dim" style={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '0.1em', marginTop: '0.25rem' }}>{card.name}</p>
                                 </div>
-                                <TrendingUp size={16} className="text-dim" />
-                            </div>
-                            <h3 className="title-lg m-0">{card.value}</h3>
-                            <p className="text-dim" style={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '0.1em', marginTop: '0.25rem' }}>{card.name}</p>
-                        </div>
-                    ))}
+                            </Link>
+                        );
+                    })}
                 </div>
 
                 {/* Main Grid */}
