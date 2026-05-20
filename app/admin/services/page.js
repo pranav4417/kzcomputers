@@ -101,7 +101,7 @@ export default function ServiceManagement() {
                 {isModalOpen && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-black/80 backdrop-blur-md" />
-                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="glass max-w-lg w-full p-10 relative">
+                        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="glass-modal max-w-lg w-full p-10 relative">
                             <h3 className="text-2xl font-black mb-6">{editingService ? 'Edit' : 'Add'} <span className="gradient-text">Service</span></h3>
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div>
@@ -113,7 +113,7 @@ export default function ServiceManagement() {
                                     <textarea rows={4} className="w-full bg-white/5 border border-white/10 p-4 rounded-xl focus:border-primary outline-none transition-all resize-none text-sm" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
                                 </div>
                                 <div className="flex gap-4">
-                                    <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-4 glass font-bold">Cancel</button>
+                                    <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-4 glass-modal font-bold">Cancel</button>
                                     <button type="submit" disabled={saving} className="flex-1 btn-primary">{saving ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'Save Service'}</button>
                                 </div>
                             </form>

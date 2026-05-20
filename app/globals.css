@@ -193,6 +193,16 @@ button {
   border-radius: 1rem;
 }
 
+/* Opaque dark panel for modals/drawers — much more readable than .glass */
+.glass-modal {
+  background: rgba(14, 14, 18, 0.97);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(108, 99, 255, 0.08);
+}
+
 .glass-hover {
   transition: var(--transition);
 }

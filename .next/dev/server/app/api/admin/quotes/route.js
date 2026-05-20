@@ -1,0 +1,13 @@
+var R=require("../../../../chunks/[turbopack]_runtime.js")("server/app/api/admin/quotes/route.js")
+R.c("server/chunks/node_modules_next_2753c4a4._.js")
+R.c("server/chunks/node_modules_html2canvas_dist_html2canvas_esm_178f5bb6.js")
+R.c("server/chunks/node_modules_core-js_bf3fc61c._.js")
+R.c("server/chunks/node_modules_canvg_lib_index_cjs_84557b9a._.js")
+R.c("server/chunks/node_modules_pako_dist_pako_esm_mjs_90207aba._.js")
+R.c("server/chunks/node_modules_jspdf_dist_jspdf_node_min_2f7aa471.js")
+R.c("server/chunks/node_modules_nodemailer_eb279b74._.js")
+R.c("server/chunks/[root-of-the-server]__5eb0061a._.js")
+R.c("server/chunks/[root-of-the-server]__4d3dfaf6._.js")
+R.c("server/chunks/_next-internal_server_app_api_admin_quotes_route_actions_fd099383.js")
+R.m("[project]/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/app/api/admin/quotes/route.js [app-route] (ecmascript)\" } [app-route] (ecmascript)")
+module.exports=R.m("[project]/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/app/api/admin/quotes/route.js [app-route] (ecmascript)\" } [app-route] (ecmascript)").exports

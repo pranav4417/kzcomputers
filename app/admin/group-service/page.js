@@ -328,7 +328,7 @@ export default function GroupServicePage() {
                                 <th>Description</th>
                                 <th class="text-center">Qty</th>
                                 <th>Unit</th>
-                                <th class="text-right">Rate</th>
+                                <th class="text-right">Selling Price</th>
                                 <th class="text-right">GST %</th>
                                 <th class="text-right">Amount</th>
                             </tr>

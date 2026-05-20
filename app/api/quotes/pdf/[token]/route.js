@@ -36,7 +36,8 @@ export async function GET(req, { params }) {
                 email: quote.guestEmail,
                 phone: quote.guestPhone
             },
-            items
+            items,
+            quote.message || ''
         );
 
         // Return PDF

@@ -121,7 +121,7 @@ export default function ProductManagement() {
                 {isModalOpen && (
                     <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsModalOpen(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(12px)' }} />
-                        <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="glass" style={{ width: '100%', maxWidth: '32rem', padding: '2.5rem', position: 'relative', zIndex: 10 }}>
+                        <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="glass-modal" style={{ width: '100%', maxWidth: '32rem', padding: '2.5rem', position: 'relative', zIndex: 10 }}>
                             <h3 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '1.5rem', margin: '0 0 1.5rem 0' }}>{editingProduct ? 'Edit' : 'Add'} <span className="gradient-text">Product</span></h3>
                             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                                 <div>

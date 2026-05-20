@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Loader2, MessageSquare, Phone, Mail, Package, ArrowRight, CheckCircle2, Plus, X, Send, DollarSign, Trash2 } from 'lucide-react';
+import { Loader2, MessageSquare, Phone, Mail, Package, ArrowRight, CheckCircle2, Plus, X, Send, DollarSign, Trash2, Download } from 'lucide-react';
 
 
 export default function AdminQuotes() {
@@ -14,7 +14,7 @@ export default function AdminQuotes() {
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
-    const [quoteItems, setQuoteItems] = useState([{ desc: '', qty: 1, unit: 'NOS', price: 0 }]);
+    const [quoteItems, setQuoteItems] = useState([{ desc: '', qty: 1, unit: 'NOS', price: 0, mrp: 0 }]);
     const [message, setMessage] = useState('');
 
     useEffect(() => {
@@ -33,7 +33,7 @@ export default function AdminQuotes() {
     }, []);
 
     const addItem = () => {
-        setQuoteItems([...quoteItems, { desc: '', qty: 1, unit: 'NOS', price: 0 }]);
+        setQuoteItems([...quoteItems, { desc: '', qty: 1, unit: 'NOS', price: 0, mrp: 0 }]);
     };
 
     const removeItem = (index) => {
@@ -91,6 +91,11 @@ export default function AdminQuotes() {
         } finally {
             setSending(false);
         }
+    };
+
+    const downloadPdf = (quoteToken) => {
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+        window.open(`${baseUrl}/api/quotes/pdf/${quoteToken}`, '_blank');
     };
 
     const deleteQuote = async (quoteId) => {
@@ -183,12 +188,21 @@ export default function AdminQuotes() {
                             <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '0.75rem', border: '1px solid rgba(255,255,255,0.05)', flexGrow: 1, marginBottom: '1rem' }}>
                                 {quote.items?.length > 0 ? (
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                        {quote.items.slice(0, 3).map((item, i) => (
-                                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
-                                                <span style={{ color: '#e5e7eb', flex: 1 }}>{item.desc || 'Item ' + (i + 1)}</span>
-                                                <span style={{ color: 'var(--primary)', fontFamily: 'monospace', fontWeight: 900 }}>₹{Number(item.price || 0).toLocaleString()}</span>
-                                            </div>
-                                        ))}
+                                        {quote.items.slice(0, 3).map((item, i) => {
+                                            const mrp = Number(item.mrp || 0);
+                                            const sellingPrice = Number(item.price || 0);
+                                            return (
+                                                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', flexDirection: 'column', gap: '0.125rem' }}>
+                                                    <span style={{ color: '#e5e7eb' }}>{item.desc || 'Item ' + (i + 1)}</span>
+                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                                        {mrp > 0 && (
+                                                            <span style={{ textDecoration: 'line-through', color: '#666', fontSize: '0.75rem' }}>₹{mrp.toLocaleString()}</span>
+                                                        )}
+                                                        <span style={{ color: '#22c55e', fontFamily: 'monospace', fontWeight: 900, fontSize: '0.8rem' }}>₹{sellingPrice.toLocaleString()}</span>
+                                                    </span>
+                                                </div>
+                                            )
+                                        })}
                                         {quote.items.length > 3 && (
                                             <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textAlign: 'center', marginTop: '0.25rem' }}>+{quote.items.length - 3} more items</div>
                                         )}
@@ -204,9 +218,27 @@ export default function AdminQuotes() {
                                 <div style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-dim)', marginBottom: '0.25rem' }}>Total Amount</div>
                                 <div style={{ color: 'var(--primary)', fontFamily: 'monospace', fontSize: '1.5rem', fontWeight: 900 }}>₹{Number(quote.amount || quote.product?.price || 0).toLocaleString()}</div>
                             </div>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <button className="btn-primary group" style={{ flex: 1, padding: '1rem', fontSize: '0.875rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', borderRadius: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                <button className="btn-primary group" style={{ flex: 1, padding: '1rem', fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', borderRadius: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', minWidth: '140px' }}>
                                     Contact Client <ArrowRight size={16} />
+                                </button>
+                                <button
+                                    onClick={() => downloadPdf(quote.quoteToken)}
+                                    title="Download PDF"
+                                    style={{
+                                        padding: '1rem',
+                                        background: 'rgba(108, 99, 255, 0.1)',
+                                        border: '1px solid rgba(108, 99, 255, 0.3)',
+                                        borderRadius: '0.75rem',
+                                        color: 'var(--primary)',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        minWidth: '48px'
+                                    }}
+                                >
+                                    <Download size={16} />
                                 </button>
                                 <button
                                     onClick={() => deleteQuote(quote.id)}
@@ -220,7 +252,8 @@ export default function AdminQuotes() {
                                         cursor: 'pointer',
                                         display: 'flex',
                                         alignItems: 'center',
-                                        justifyContent: 'center'
+                                        justifyContent: 'center',
+                                        minWidth: '48px'
                                     }}
                                 >
                                     <Trash2 size={16} />
@@ -265,8 +298,18 @@ export default function AdminQuotes() {
                                 </button>
                             </div>
 
+                            {/* Column Headers */}
+                            <div style={{ display: 'grid', gridTemplateColumns: '2fr 0.5fr 0.5fr 1fr 1fr auto', gap: '0.5rem', marginBottom: '0.375rem', alignItems: 'center' }}>
+                                <span style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-dim)' }}>Description</span>
+                                <span style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-dim)', textAlign: 'center' }}>Qty</span>
+                                <span style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-dim)', textAlign: 'center' }}>Unit</span>
+                                <span style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-dim)', textAlign: 'right' }}>MRP</span>
+                                <span style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#22c55e', textAlign: 'right' }}>Selling Price</span>
+                                <span></span>
+                            </div>
+
                             {quoteItems.map((item, index) => (
-                                <div key={index} style={{ display: 'grid', gridTemplateColumns: '2fr 0.5fr 0.5fr 1fr auto', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
+                                <div key={index} style={{ display: 'grid', gridTemplateColumns: '2fr 0.5fr 0.5fr 1fr 1fr auto', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
                                     <input value={item.desc} onChange={e => updateItem(index, 'desc', e.target.value)} className="input-field" style={{ padding: '0.5rem' }} placeholder="Description" />
                                     <input type="number" value={item.qty} onChange={e => updateItem(index, 'qty', e.target.value)} className="input-field" style={{ padding: '0.5rem' }} placeholder="Qty" />
                                     <select value={item.unit} onChange={e => updateItem(index, 'unit', e.target.value)} className="input-field" style={{ padding: '0.5rem' }}>
@@ -275,7 +318,8 @@ export default function AdminQuotes() {
                                         <option value="Kgs">Kgs</option>
                                         <option value="Ltr">Ltr</option>
                                     </select>
-                                    <input type="number" value={item.price} onChange={e => updateItem(index, 'price', e.target.value)} className="input-field" style={{ padding: '0.5rem' }} placeholder="Price" />
+                                    <input type="number" value={item.mrp} onChange={e => updateItem(index, 'mrp', e.target.value)} className="input-field" style={{ padding: '0.5rem' }} placeholder="0" />
+                                    <input type="number" value={item.price} onChange={e => updateItem(index, 'price', e.target.value)} className="input-field" style={{ padding: '0.5rem' }} placeholder="0" />
                                     <button onClick={() => removeItem(index)} disabled={quoteItems.length === 1} style={{ background: 'rgba(239,68,68,0.2)', border: 'none', color: '#ef4444', padding: '0.5rem', borderRadius: '0.5rem', cursor: quoteItems.length === 1 ? 'not-allowed' : 'pointer' }}>
                                         <X size={16} />
                                     </button>
@@ -288,10 +332,10 @@ export default function AdminQuotes() {
                             </div>
                         </div>
 
-                        {/* Message */}
+                        {/* Message / Note to Customer */}
                         <div style={{ marginBottom: '1.5rem' }}>
-                            <label style={{ display: 'block', color: 'var(--text-dim)', fontSize: '0.75rem', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Additional Message</label>
-                            <textarea value={message} onChange={e => setMessage(e.target.value)} className="input-field" style={{ width: '100%', padding: '0.75rem', minHeight: '80px' }} placeholder="Optional message to customer" />
+                            <label style={{ display: 'block', color: 'var(--text-dim)', fontSize: '0.75rem', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Note to Customer</label>
+                            <textarea value={message} onChange={e => setMessage(e.target.value)} className="input-field" style={{ width: '100%', padding: '0.75rem', minHeight: '80px' }} placeholder="Add a note or message for the customer (e.g. delivery instructions, special terms, discount details)..." />
                         </div>
 
                         {/* Actions */}

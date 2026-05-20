@@ -14,8 +14,8 @@ export default function AgentManagement() {
     const [newAgent, setNewAgent] = useState({ username: '', email: '', password: '', role: 'agent' });
     const [currentUser, setCurrentUser] = useState(null);
 
-    useEffect(() => { 
-        fetchAgents(); 
+    useEffect(() => {
+        fetchAgents();
         fetchCurrentUser();
     }, []);
 
@@ -141,21 +141,21 @@ export default function AgentManagement() {
                                 </button>
                             )}
 
-                            {agent.role?.toLowerCase() !== 'admin' && 
-                             agent.role?.toLowerCase() !== 'superadmin' && 
-                             String(agent.id) !== String(currentUser?.id) && 
-                             currentUser?.role?.toLowerCase() === 'superadmin' && (
-                                <button
-                                    onClick={() => handleDeleteAgent(agent.id)}
-                                    className="md:opacity-0 md:group-hover:opacity-100"
-                                    title="Remove access"
-                                    style={{ position: 'absolute', top: '1rem', right: '1rem', transition: 'opacity 0.3s', padding: '0.5rem', color: 'var(--secondary)', background: 'rgba(255, 101, 132, 0.1)', borderRadius: '0.5rem', cursor: 'pointer', border: 'none' }}
-                                    onMouseOver={e => e.currentTarget.style.background = 'rgba(255, 101, 132, 0.2)'}
-                                    onMouseOut={e => e.currentTarget.style.background = 'rgba(255, 101, 132, 0.1)'}
-                                >
-                                    <Trash2 size={16} />
-                                </button>
-                            )}
+                            {agent.role?.toLowerCase() !== 'admin' &&
+                                agent.role?.toLowerCase() !== 'superadmin' &&
+                                String(agent.id) !== String(currentUser?.id) &&
+                                currentUser?.role?.toLowerCase() === 'superadmin' && (
+                                    <button
+                                        onClick={() => handleDeleteAgent(agent.id)}
+                                        className="md:opacity-0 md:group-hover:opacity-100"
+                                        title="Remove access"
+                                        style={{ position: 'absolute', top: '1rem', right: '1rem', transition: 'opacity 0.3s', padding: '0.5rem', color: 'var(--secondary)', background: 'rgba(255, 101, 132, 0.1)', borderRadius: '0.5rem', cursor: 'pointer', border: 'none' }}
+                                        onMouseOver={e => e.currentTarget.style.background = 'rgba(255, 101, 132, 0.2)'}
+                                        onMouseOut={e => e.currentTarget.style.background = 'rgba(255, 101, 132, 0.1)'}
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                )}
                         </div>
                     ))
                 )}
@@ -166,7 +166,7 @@ export default function AgentManagement() {
                 {isModalOpen && (
                     <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsModalOpen(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }} />
-                        <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="glass" style={{ maxWidth: '32rem', width: '100%', padding: '2.5rem', position: 'relative', zIndex: 10 }}>
+                        <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="glass-modal" style={{ maxWidth: '32rem', width: '100%', padding: '2.5rem', position: 'relative', zIndex: 10 }}>
                             <h3 className="title-md" style={{ marginBottom: '2rem', margin: '0 0 2rem 0', fontWeight: 900 }}>Authorize <span className="gradient-text">Staff</span></h3>
                             <form onSubmit={handleAddAgent} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                                 <div>

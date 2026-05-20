@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Loader2, CheckCircle2, XCircle, Download, ArrowLeft, Mail, Phone } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, Download, ArrowLeft, Mail, Phone, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
@@ -139,6 +139,16 @@ export default function QuotePage() {
                         </div>
                     </div>
 
+                    {/* Message / Additional Note */}
+                    {quote?.message && (
+                        <div style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
+                            <div style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-dim)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}><MessageSquare size={14} /> Additional Note</div>
+                            <div style={{ background: 'rgba(108, 99, 255, 0.08)', border: '1px solid rgba(108, 99, 255, 0.2)', padding: '1rem', borderRadius: '0.75rem', color: '#e5e7eb', fontSize: '0.875rem', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                                {quote.message}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Items Table */}
                     {items.length > 0 && (
                         <div style={{ marginTop: '1.5rem' }}>
@@ -149,20 +159,34 @@ export default function QuotePage() {
                                         <th style={{ padding: '0.75rem', textAlign: 'left', color: '#fff', fontSize: '0.625rem', textTransform: 'uppercase' }}>#</th>
                                         <th style={{ padding: '0.75rem', textAlign: 'left', color: '#fff', fontSize: '0.625rem', textTransform: 'uppercase' }}>Description</th>
                                         <th style={{ padding: '0.75rem', textAlign: 'center', color: '#fff', fontSize: '0.625rem', textTransform: 'uppercase' }}>Qty</th>
-                                        <th style={{ padding: '0.75rem', textAlign: 'right', color: '#fff', fontSize: '0.625rem', textTransform: 'uppercase' }}>Rate</th>
+                                        <th style={{ padding: '0.75rem', textAlign: 'right', color: '#fff', fontSize: '0.625rem', textTransform: 'uppercase' }}>MRP</th>
+                                        <th style={{ padding: '0.75rem', textAlign: 'right', color: '#fff', fontSize: '0.625rem', textTransform: 'uppercase' }}>Selling Price</th>
                                         <th style={{ padding: '0.75rem', textAlign: 'right', color: '#fff', fontSize: '0.625rem', textTransform: 'uppercase' }}>Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {items.map((item, i) => (
-                                        <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                            <td style={{ padding: '0.75rem', textAlign: 'center', color: 'var(--text-dim)' }}>{i + 1}</td>
-                                            <td style={{ padding: '0.75rem', color: '#fff' }}>{item.desc}</td>
-                                            <td style={{ padding: '0.75rem', textAlign: 'center', color: 'var(--text-dim)' }}>{item.qty || 1}</td>
-                                            <td style={{ padding: '0.75rem', textAlign: 'right', color: 'var(--text-dim)' }}>₹{parseFloat(item.price || 0).toFixed(2)}</td>
-                                            <td style={{ padding: '0.75rem', textAlign: 'right', color: '#fff', fontWeight: 'bold' }}>₹{(parseFloat(item.price || 0) * (item.qty || 1)).toFixed(2)}</td>
-                                        </tr>
-                                    ))}
+                                    {items.map((item, i) => {
+                                        const mrp = parseFloat(item.mrp || 0);
+                                        const sellingPrice = parseFloat(item.price || 0);
+                                        const qty = parseInt(item.qty || 1);
+                                        const amount = sellingPrice * qty;
+                                        return (
+                                            <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                                <td style={{ padding: '0.75rem', textAlign: 'center', color: 'var(--text-dim)' }}>{i + 1}</td>
+                                                <td style={{ padding: '0.75rem', color: '#fff' }}>{item.desc}</td>
+                                                <td style={{ padding: '0.75rem', textAlign: 'center', color: 'var(--text-dim)' }}>{qty}</td>
+                                                <td style={{ padding: '0.75rem', textAlign: 'right', color: 'var(--text-dim)' }}>
+                                                    {mrp > 0 ? (
+                                                        <span>
+                                                            <span style={{ textDecoration: 'line-through', color: '#999', marginRight: '0.5rem' }}>₹{mrp.toFixed(2)}</span>
+                                                        </span>
+                                                    ) : '-'}
+                                                </td>
+                                                <td style={{ padding: '0.75rem', textAlign: 'right', color: '#22c55e', fontWeight: 'bold' }}>₹{sellingPrice.toFixed(2)}</td>
+                                                <td style={{ padding: '0.75rem', textAlign: 'right', color: '#fff', fontWeight: 'bold' }}>₹{amount.toFixed(2)}</td>
+                                            </tr>
+                                        )
+                                    })}
                                 </tbody>
                             </table>
                         </div>

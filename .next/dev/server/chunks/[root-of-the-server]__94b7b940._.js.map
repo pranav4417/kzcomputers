@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 46, "column": 0}, "map": {"version":3,"sources":["file:///Users/pranav/Music/Suraksha_wb/app/api/auth/logout/route.js"],"sourcesContent":["import { NextResponse } from 'next/server';\n\nexport async function POST() {\n    try {\n        const response = NextResponse.json({ success: true });\n        response.cookies.set('auth_token', '', { expires: new Date(0), path: '/' });\n        return response;\n    } catch (error) {\n        console.error('Logout error:', error);\n        return NextResponse.json({ success: false, error: 'Logout failed' }, { status: 500 });\n    }\n}\n"],"names":[],"mappings":";;;;AAAA;;AAEO,eAAe;IAClB,IAAI;QACA,MAAM,WAAW,gJAAY,CAAC,IAAI,CAAC;YAAE,SAAS;QAAK;QACnD,SAAS,OAAO,CAAC,GAAG,CAAC,cAAc,IAAI;YAAE,SAAS,IAAI,KAAK;YAAI,MAAM;QAAI;QACzE,OAAO;IACX,EAAE,OAAO,OAAO;QACZ,QAAQ,KAAK,CAAC,iBAAiB;QAC/B,OAAO,gJAAY,CAAC,IAAI,CAAC;YAAE,SAAS;YAAO,OAAO;QAAgB,GAAG;YAAE,QAAQ;QAAI;IACvF;AACJ"}}]
+}

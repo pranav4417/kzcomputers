@@ -11,30 +11,30 @@ export default async function AdminOverview() {
 
     // Base query filters
     const baseFilter = isAgent ? { assignedToId: agentId } : {};
-    
+
     // Optimize: Run all queries in parallel
     const [
-        totalTickets, 
-        openTickets, 
-        completedTickets, 
+        totalTickets,
+        openTickets,
+        completedTickets,
         otherStat, // totalProducts for Admin, urgentTickets for Agent
-        recentTickets, 
+        recentTickets,
         serviceDistribution
     ] = await Promise.all([
         prisma.ticket.count({ where: baseFilter }),
-        prisma.ticket.count({ 
-            where: { 
-                ...baseFilter, 
-                status: { in: ['Open', 'In Progress', 'Pending Parts'] } 
-            } 
+        prisma.ticket.count({
+            where: {
+                ...baseFilter,
+                status: { in: ['Open', 'In Progress', 'Pending Parts'] }
+            }
         }),
-        prisma.ticket.count({ 
-            where: { 
-                ...baseFilter, 
-                status: { in: ['Completed', 'Closed'] } 
-            } 
+        prisma.ticket.count({
+            where: {
+                ...baseFilter,
+                status: { in: ['Completed', 'Closed'] }
+            }
         }),
-        isAgent 
+        isAgent
             ? prisma.ticket.count({ where: { ...baseFilter, priority: 'High', status: { not: 'Closed' } } })
             : prisma.product.count(),
         prisma.ticket.findMany({

@@ -117,12 +117,21 @@ export default async function TrackResult({ params }) {
                                                 </div>
 
                                                 <div className="space-y-3 mb-6">
-                                                    {items.map((item, i) => (
-                                                        <div key={i} className="flex justify-between items-center text-sm">
-                                                            <span className="text-gray-300 font-medium">{item.desc}</span>
-                                                            <span className="font-mono text-white tracking-tight">${Number(item.price).toFixed(2)}</span>
-                                                        </div>
-                                                    ))}
+                                                    {items.map((item, i) => {
+                                                        const mrp = Number(item.mrp || 0);
+                                                        const sellingPrice = Number(item.price || 0);
+                                                        return (
+                                                            <div key={i} className="flex justify-between items-center text-sm">
+                                                                <span className="text-gray-300 font-medium">{item.desc}</span>
+                                                                <span className="font-mono tracking-tight">
+                                                                    {mrp > 0 && (
+                                                                        <span className="text-gray-500 line-through mr-2">₹{mrp.toFixed(2)}</span>
+                                                                    )}
+                                                                    <span className="text-green-400 font-bold">₹{sellingPrice.toFixed(2)}</span>
+                                                                </span>
+                                                            </div>
+                                                        )
+                                                    })}
                                                 </div>
 
                                                 <div className="flex justify-between items-center pt-4 border-t border-white/10">

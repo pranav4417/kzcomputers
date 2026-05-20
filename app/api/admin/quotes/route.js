@@ -61,7 +61,7 @@ export async function POST(req) {
         });
 
         // Generate PDF
-        const pdfBuffer = generateQuotePDFBuffer(quote, { customerName, email: customerEmail, phone: customerPhone }, parsedItems);
+        const pdfBuffer = generateQuotePDFBuffer(quote, { customerName, email: customerEmail, phone: customerPhone }, parsedItems, message);
 
         // Note: Vercel has read-only filesystem, so we can't save PDFs to disk
         // Instead, we'll generate PDF on-demand or attach to email

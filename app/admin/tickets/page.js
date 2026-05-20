@@ -25,7 +25,7 @@ export default function TicketManagement() {
     // Invoice state
     const [invoiceItems, setInvoiceItems] = useState([]);
     const [activeTab, setActiveTab] = useState('services'); // services, parts, custom
-    const [customItem, setCustomItem] = useState({ desc: '', qty: 1, unit: 'NOS', price: 0 });
+    const [customItem, setCustomItem] = useState({ desc: '', qty: 1, unit: 'NOS', price: 0, mrp: 0 });
     const [generatingInvoice, setGeneratingInvoice] = useState(false);
     const [sendEmailChecked, setSendEmailChecked] = useState(true);
     const [existingInvoice, setExistingInvoice] = useState(null);
@@ -35,6 +35,20 @@ export default function TicketManagement() {
     const [partsPresets, setPartsPresets] = useState([]);
 
     const [session, setSession] = useState(null);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [createForm, setCreateForm] = useState({
+        customerName: '',
+        email: '',
+        phone: '',
+        product: '',
+        customProduct: '',
+        serviceType: 'Repair',
+        priority: 'Medium',
+        subject: '',
+        description: '',
+        assignedToId: '',
+    });
+    const [creatingTicket, setCreatingTicket] = useState(false);
 
     useEffect(() => {
         const checkUserSession = async () => {
@@ -94,6 +108,54 @@ export default function TicketManagement() {
             }
         } catch (e) {
             console.log('No products found');
+        }
+    };
+
+    const handleCreateTicket = async (e) => {
+        e.preventDefault();
+        setCreatingTicket(true);
+        try {
+            const payload = { ...createForm };
+            if (createForm.product === 'Custom') {
+                payload.product = createForm.customProduct || 'Custom Product';
+            }
+            delete payload.customProduct;
+
+            if (session?.role === 'agent') {
+                payload.assignedToId = session.id;
+            }
+
+            const res = await fetch('/api/admin/tickets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                alert('Ticket created successfully!');
+                setIsCreateModalOpen(false);
+                setCreateForm({
+                    customerName: '',
+                    email: '',
+                    phone: '',
+                    product: '',
+                    customProduct: '',
+                    serviceType: 'Repair',
+                    priority: 'Medium',
+                    subject: '',
+                    description: '',
+                    assignedToId: '',
+                });
+                fetchTickets();
+            } else {
+                const errData = await res.json();
+                alert('Failed to create ticket: ' + (errData.error || 'Unknown error'));
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Failed to create ticket');
+        } finally {
+            setCreatingTicket(false);
         }
     };
 
@@ -173,18 +235,19 @@ export default function TicketManagement() {
                 desc: item.name,
                 qty: 1,
                 unit: item.unit || 'NOS',
-                price: item.price
+                price: item.price,
+                mrp: 0
             }]);
         }
     };
 
     const addCustomItem = () => {
         if (!customItem.desc || !customItem.price) {
-            alert('Please enter item description and price');
+            alert('Please enter item description and selling price');
             return;
         }
         setInvoiceItems([...invoiceItems, { ...customItem, qty: parseInt(customItem.qty) || 1 }]);
-        setCustomItem({ desc: '', qty: 1, unit: 'NOS', price: 0 });
+        setCustomItem({ desc: '', qty: 1, unit: 'NOS', price: 0, mrp: 0 });
     };
 
     const removeItem = (index) => {
@@ -378,6 +441,8 @@ export default function TicketManagement() {
         }
     };
 
+    const canCreate = session && (session.role !== 'agent' || session.canCreateTickets !== false);
+
     const filteredTickets = tickets.filter(t =>
         t.ticketNumber.toLowerCase().includes(search.toLowerCase()) ||
         t.customerName.toLowerCase().includes(search.toLowerCase()) ||
@@ -392,7 +457,7 @@ export default function TicketManagement() {
                     <p className="text-dim" style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>Manage and track all customer service requests.</p>
                 </div>
 
-                <div style={{ flex: '1 1 auto', maxWidth: '400px', display: 'flex', gap: '1rem' }}>
+                <div style={{ flex: '1 1 auto', maxWidth: '600px', display: 'flex', gap: '1rem', alignItems: 'center' }}>
                     <div className="glass" style={{ display: 'flex', alignItems: 'center', padding: '0.5rem 1rem', flex: 1, borderRadius: '0.75rem' }}>
                         <Search size={16} className="text-dim" />
                         <input
@@ -402,6 +467,15 @@ export default function TicketManagement() {
                             value={search} onChange={e => setSearch(e.target.value)}
                         />
                     </div>
+                    {canCreate && (
+                        <button
+                            onClick={() => setIsCreateModalOpen(true)}
+                            className="btn-primary"
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.25rem', borderRadius: '0.75rem', fontWeight: 900, fontSize: '0.875rem', whiteSpace: 'nowrap' }}
+                        >
+                            <Plus size={18} /> New Ticket
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -697,10 +771,18 @@ export default function TicketManagement() {
                                                 {activeTab === 'custom' && (
                                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                                                         <input value={customItem.desc} onChange={e => setCustomItem({ ...customItem, desc: e.target.value })} className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }} placeholder="Description" />
-                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
-                                                            <input type="number" value={customItem.qty} onChange={e => setCustomItem({ ...customItem, qty: e.target.value })} className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }} placeholder="Qty" />
-                                                            <select value={customItem.unit} onChange={e => setCustomItem({ ...customItem, unit: e.target.value })} className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }}><option value="NOS">NOS</option></select>
-                                                            <input type="number" value={customItem.price} onChange={e => setCustomItem({ ...customItem, price: e.target.value })} className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }} placeholder="Price" />
+                                                        {/* Column Headers */}
+                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '0.5rem', marginBottom: '0.25rem', alignItems: 'center' }}>
+                                                            <span style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-dim)', textAlign: 'center' }}>Qty</span>
+                                                            <span style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-dim)', textAlign: 'center' }}>Unit</span>
+                                                            <span style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-dim)', textAlign: 'right' }}>MRP (Optional)</span>
+                                                            <span style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#22c55e', textAlign: 'right' }}>Selling Price *</span>
+                                                        </div>
+                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '0.5rem' }}>
+                                                            <input type="number" value={customItem.qty} onChange={e => setCustomItem({ ...customItem, qty: e.target.value })} className="input-field" style={{ width: '100%', padding: '0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }} placeholder="1" />
+                                                            <select value={customItem.unit} onChange={e => setCustomItem({ ...customItem, unit: e.target.value })} className="input-field" style={{ width: '100%', padding: '0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }}><option value="NOS">NOS</option></select>
+                                                            <input type="number" value={customItem.mrp} onChange={e => setCustomItem({ ...customItem, mrp: e.target.value })} className="input-field" style={{ width: '100%', padding: '0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }} placeholder="0" />
+                                                            <input type="number" value={customItem.price} onChange={e => setCustomItem({ ...customItem, price: e.target.value })} className="input-field" style={{ width: '100%', padding: '0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem' }} placeholder="0" />
                                                         </div>
                                                         <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: '#fff', fontSize: '0.875rem' }}>
                                                             <input type="checkbox" checked={excludingGst} onChange={e => setExcludingGst(e.target.checked)} style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
@@ -741,18 +823,31 @@ export default function TicketManagement() {
                                                     </div>
                                                 )}
 
-                                                {invoiceItems.map((item, index) => (
-                                                    <div key={index} style={{ background: 'rgba(255,255,255,0.03)', padding: '0.75rem', borderRadius: '0.5rem', marginBottom: '0.5rem', display: 'flex', justifyContent: 'space-between' }}>
-                                                        <div>
-                                                            <div style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>{item.desc}</div>
-                                                            <div style={{ fontSize: '0.65rem', color: 'var(--text-dim)' }}>₹{item.price} x {item.qty}</div>
+                                                {invoiceItems.map((item, index) => {
+                                                    const mrp = Number(item.mrp || 0);
+                                                    const sellingPrice = Number(item.price || 0);
+                                                    const total = sellingPrice * (item.qty || 1);
+                                                    return (
+                                                        <div key={index} style={{ background: 'rgba(255,255,255,0.03)', padding: '0.75rem', borderRadius: '0.5rem', marginBottom: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                                <div>
+                                                                    <div style={{ fontSize: '0.75rem', fontWeight: 'bold' }}>{item.desc}</div>
+                                                                    <div style={{ fontSize: '0.65rem', color: 'var(--text-dim)' }}>
+                                                                        {item.qty} {item.unit}
+                                                                        {mrp > 0 && (
+                                                                            <span> · MRP: <span style={{ textDecoration: 'line-through', color: '#666' }}>₹{mrp.toLocaleString()}</span></span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                                <button onClick={() => removeItem(index)} style={{ color: 'var(--secondary)', border: 'none', background: 'transparent' }}><X size={12} /></button>
+                                                            </div>
+                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                <span style={{ fontSize: '0.7rem', color: '#22c55e', fontWeight: 'bold' }}>₹{sellingPrice.toLocaleString()} / {item.unit}</span>
+                                                                <span style={{ fontWeight: 'bold', color: '#4ade80', fontSize: '0.875rem' }}>₹{total.toLocaleString()}</span>
+                                                            </div>
                                                         </div>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                            <button onClick={() => removeItem(index)} style={{ color: 'var(--secondary)', border: 'none', background: 'transparent' }}><X size={12} /></button>
-                                                            <div style={{ fontWeight: 'bold', color: '#4ade80' }}>₹{getItemTotal(item)}</div>
-                                                        </div>
-                                                    </div>
-                                                ))}
+                                                    )
+                                                })}
                                             </div>
                                             {invoiceItems.length > 0 && (
                                                 <div style={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -809,6 +904,110 @@ export default function TicketManagement() {
                                     </button>
                                 </div>
                             </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Create Ticket Modal */}
+            <AnimatePresence>
+                {isCreateModalOpen && (
+                    <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsCreateModalOpen(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }} />
+                        <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="glass-modal" style={{ maxWidth: '42rem', width: '100%', padding: '2.5rem', position: 'relative', zIndex: 10, maxHeight: '90vh', overflowY: 'auto' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                                <h3 className="title-md" style={{ margin: 0, fontWeight: 900 }}>Create New <span className="gradient-text">Ticket</span></h3>
+                                <button onClick={() => setIsCreateModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = 'var(--text-dim)'}>
+                                    <X size={20} />
+                                </button>
+                            </div>
+                            <form onSubmit={handleCreateTicket} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div>
+                                        <label style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-dim)', marginBottom: '0.5rem', display: 'block' }}>Customer Name *</label>
+                                        <input required className="input-field" style={{ width: '100%', padding: '1rem', borderRadius: '0.75rem', background: 'rgba(255,255,255,0.05)', fontSize: '0.875rem' }} value={createForm.customerName} onChange={e => setCreateForm({ ...createForm, customerName: e.target.value })} />
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-dim)', marginBottom: '0.5rem', display: 'block' }}>Phone Number *</label>
+                                        <input required type="tel" className="input-field" style={{ width: '100%', padding: '1rem', borderRadius: '0.75rem', background: 'rgba(255,255,255,0.05)', fontSize: '0.875rem' }} value={createForm.phone} onChange={e => setCreateForm({ ...createForm, phone: e.target.value })} />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-dim)', marginBottom: '0.5rem', display: 'block' }}>Email Address *</label>
+                                    <input required type="email" className="input-field" style={{ width: '100%', padding: '1rem', borderRadius: '0.75rem', background: 'rgba(255,255,255,0.05)', fontSize: '0.875rem' }} value={createForm.email} onChange={e => setCreateForm({ ...createForm, email: e.target.value })} />
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div>
+                                        <label style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-dim)', marginBottom: '0.5rem', display: 'block' }}>Product *</label>
+                                        <div className="input-field" style={{ padding: 0, overflow: 'hidden', background: 'rgba(255,255,255,0.05)', borderRadius: '0.75rem' }}>
+                                            <select required style={{ appearance: 'none', background: 'transparent', border: 'none', width: '100%', padding: '1rem', color: 'inherit', fontSize: '0.875rem', fontWeight: 'bold', outline: 'none' }} value={createForm.product} onChange={e => setCreateForm({ ...createForm, product: e.target.value })}>
+                                                <option value="" style={{ background: 'var(--bg-dark)' }}>Select Product</option>
+                                                {products.map(p => (
+                                                    <option key={p.id} value={p.name} style={{ background: 'var(--bg-dark)' }}>{p.name}</option>
+                                                ))}
+                                                <option value="Custom" style={{ background: 'var(--bg-dark)' }}>Other / Custom</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-dim)', marginBottom: '0.5rem', display: 'block' }}>Service Type *</label>
+                                        <div className="input-field" style={{ padding: 0, overflow: 'hidden', background: 'rgba(255,255,255,0.05)', borderRadius: '0.75rem' }}>
+                                            <select style={{ appearance: 'none', background: 'transparent', border: 'none', width: '100%', padding: '1rem', color: 'inherit', fontSize: '0.875rem', fontWeight: 'bold', outline: 'none' }} value={createForm.serviceType} onChange={e => setCreateForm({ ...createForm, serviceType: e.target.value })}>
+                                                <option value="Repair" style={{ background: 'var(--bg-dark)' }}>Repair</option>
+                                                <option value="Installation" style={{ background: 'var(--bg-dark)' }}>Installation</option>
+                                                <option value="Maintenance" style={{ background: 'var(--bg-dark)' }}>Maintenance</option>
+                                                <option value="Support" style={{ background: 'var(--bg-dark)' }}>Support</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                {createForm.product === 'Custom' && (
+                                    <div>
+                                        <label style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-dim)', marginBottom: '0.5rem', display: 'block' }}>Custom Product Name *</label>
+                                        <input required className="input-field" style={{ width: '100%', padding: '1rem', borderRadius: '0.75rem', background: 'rgba(255,255,255,0.05)', fontSize: '0.875rem' }} value={createForm.customProduct || ''} onChange={e => setCreateForm({ ...createForm, customProduct: e.target.value })} />
+                                    </div>
+                                )}
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div>
+                                        <label style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-dim)', marginBottom: '0.5rem', display: 'block' }}>Priority *</label>
+                                        <div className="input-field" style={{ padding: 0, overflow: 'hidden', background: 'rgba(255,255,255,0.05)', borderRadius: '0.75rem' }}>
+                                            <select style={{ appearance: 'none', background: 'transparent', border: 'none', width: '100%', padding: '1rem', color: 'inherit', fontSize: '0.875rem', fontWeight: 'bold', outline: 'none' }} value={createForm.priority} onChange={e => setCreateForm({ ...createForm, priority: e.target.value })}>
+                                                <option value="Low" style={{ background: 'var(--bg-dark)' }}>Low</option>
+                                                <option value="Medium" style={{ background: 'var(--bg-dark)' }}>Medium</option>
+                                                <option value="High" style={{ background: 'var(--bg-dark)' }}>High</option>
+                                                <option value="Urgent" style={{ background: 'var(--bg-dark)' }}>Urgent</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {session?.role !== 'agent' && (
+                                        <div>
+                                            <label style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-dim)', marginBottom: '0.5rem', display: 'block' }}>Assign Technician / Agent</label>
+                                            <div className="input-field" style={{ padding: 0, overflow: 'hidden', background: 'rgba(255,255,255,0.05)', borderRadius: '0.75rem' }}>
+                                                <select style={{ appearance: 'none', background: 'transparent', border: 'none', width: '100%', padding: '1rem', color: 'inherit', fontSize: '0.875rem', fontWeight: 'bold', outline: 'none' }} value={createForm.assignedToId} onChange={e => setCreateForm({ ...createForm, assignedToId: e.target.value })}>
+                                                    <option value="" style={{ background: 'var(--bg-dark)' }}>Unassigned</option>
+                                                    {agents.map(a => (
+                                                        <option key={a.id} value={a.id} style={{ background: 'var(--bg-dark)' }}>{a.username}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-dim)', marginBottom: '0.5rem', display: 'block' }}>Subject *</label>
+                                    <input required className="input-field" style={{ width: '100%', padding: '1rem', borderRadius: '0.75rem', background: 'rgba(255,255,255,0.05)', fontSize: '0.875rem' }} value={createForm.subject} onChange={e => setCreateForm({ ...createForm, subject: e.target.value })} placeholder="e.g., Screen replacement required" />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.625rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-dim)', marginBottom: '0.5rem', display: 'block' }}>Description</label>
+                                    <textarea rows={3} className="input-field" style={{ width: '100%', padding: '1rem', borderRadius: '0.75rem', background: 'rgba(255,255,255,0.05)', fontSize: '0.875rem', resize: 'none' }} value={createForm.description} onChange={e => setCreateForm({ ...createForm, description: e.target.value })} placeholder="Provide any additional issue details..." />
+                                </div>
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                                    <button type="button" onClick={() => setIsCreateModalOpen(false)} style={{ flex: 1, padding: '1rem', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0.75rem', fontWeight: 900, fontSize: '0.875rem', background: 'rgba(255,255,255,0.05)', color: 'var(--text-dim)', cursor: 'pointer' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = 'var(--text-dim)'}>Cancel</button>
+                                    <button type="submit" disabled={creatingTicket} className="btn-primary" style={{ flex: 1, padding: '1rem', borderRadius: '0.75rem', fontWeight: 900, fontSize: '0.875rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                                        {creatingTicket ? <><Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> Creating...</> : 'Create Ticket'}
+                                    </button>
+                                </div>
+                            </form>
                         </motion.div>
                     </div>
                 )}
