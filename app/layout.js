@@ -5,7 +5,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'Suraksha Group of Computers | Premium Computer Services',
+  title: 'KZ COMPUTERS | Premium Computer Services',
   description: 'Pro-level computer repairs, CCTV installation, and custom PC building in Bangalore. Experience the next level of service.',
 };
 

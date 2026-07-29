@@ -539,7 +539,7 @@ export default function ExportDataClient() {
                             borderRadius: '0.75rem',
                             border: 'none',
                             background: canExport && !isExporting
-                                ? 'linear-gradient(135deg, var(--primary), #8b7cff)'
+                                ? 'linear-gradient(135deg, var(--primary), #0082C8)'
                                 : 'rgba(255,255,255,0.05)',
                             color: canExport && !isExporting ? '#fff' : 'var(--text-dim)',
                             fontWeight: 600,

@@ -96,7 +96,7 @@ export default function AuthPage() {
                     style={{ maxWidth: '28rem' }}
                 >
                     <div className="text-center mb-8">
-                        <h2 className="title-md">{isRegister ? 'Join' : 'Welcome'} <span className="gradient-text">Suraksha</span></h2>
+                        <h2 className="title-md">{isRegister ? 'Join' : 'Welcome'} <span className="gradient-text">KZ COMPUTERS</span></h2>
                         <p className="text-dim">{step === 1 ? 'Enter your details to proceed' : 'Enter the 6-digit code sent to your email'}</p>
                     </div>
 

@@ -88,7 +88,7 @@ export default function QuotePage() {
                 </Link>
 
                 {/* Header */}
-                <div style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #8B5CF6 100%)', borderRadius: '1rem', padding: '2rem', marginBottom: '1.5rem', textAlign: 'center' }}>
+                <div style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #0082C8 100%)', borderRadius: '1rem', padding: '2rem', marginBottom: '1.5rem', textAlign: 'center' }}>
                     <h1 style={{ color: '#fff', fontSize: '2rem', fontWeight: 900, margin: 0 }}>QUOTE</h1>
                     <p style={{ color: 'rgba(255,255,255,0.8)', margin: '0.5rem 0 0 0', fontFamily: 'monospace' }}>#{quote?.quoteToken?.substring(0, 8).toUpperCase() || quote?.id}</p>
                 </div>

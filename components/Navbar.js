@@ -62,8 +62,8 @@ export default function Navbar() {
                 <Link href="/" className="nav-logo">
                     <img
                         src="/logo/logo horizontal.png"
-                        alt="Suraksha Logo"
-                        style={{ height: '55px', width: 'auto', objectFit: 'contain' }}
+                        alt="KZ COMPUTERS Logo"
+                        style={{ height: '65px', width: 'auto', objectFit: 'contain' }}
                     />
                 </Link>
 

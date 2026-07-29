@@ -38,17 +38,17 @@ export async function POST(request) {
 
         // Send OTP via email
         const html = `
-            <div style="font-family:Inter,sans-serif;max-width:480px;margin:auto;background:#1a1a2e;padding:40px;border-radius:16px;">
-                <h2 style="color:#6C63FF;margin-bottom:8px;">Suraksha Group - Password Reset</h2>
+            <div style="font-family:Inter,sans-serif;max-width:480px;margin:auto;background:#1A202C;padding:40px;border-radius:16px;">
+                <h2 style="color:#003B73;margin-bottom:8px;">KZ COMPUTERS - Password Reset</h2>
                 <p style="color:#ccc;">Your password reset verification code:</p>
-                <div style="font-size:36px;font-weight:bold;letter-spacing:12px;color:#fff;background:#2a2a4a;padding:20px;border-radius:8px;text-align:center;margin:20px 0;">${otp}</div>
+                <div style="font-size:36px;font-weight:bold;letter-spacing:12px;color:#fff;background:#2d3748;padding:20px;border-radius:8px;text-align:center;margin:20px 0;">${otp}</div>
                 <p style="color:#aaa;font-size:14px;">This OTP expires in 10 minutes. Do not share it with anyone.</p>
             </div>
         `;
 
         await sendEmail({
             to: customer.email,
-            subject: 'Suraksha Group - Password Reset OTP',
+            subject: 'KZ COMPUTERS - Password Reset OTP',
             html
         });
 

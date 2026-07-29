@@ -11,7 +11,7 @@ export default function Footer() {
                     <Link href="/" className="nav-logo mb-6">
                         <img
                             src="/logo/logo horizontal.png"
-                            alt="Suraksha Logo"
+                            alt="KZ COMPUTERS Logo"
                             style={{ height: '50px', width: 'auto', objectFit: 'contain' }}
                         />
                     </Link>
@@ -71,7 +71,7 @@ export default function Footer() {
             </div>
 
             <div className="container pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
-                <p className="text-dim" style={{ fontSize: '0.75rem' }}>&copy; 2026 Suraksha Group of Computers. All rights reserved.</p>
+                <p className="text-dim" style={{ fontSize: '0.75rem' }}>&copy; 2026 KZ COMPUTERS. All rights reserved.</p>
                 <div className="flex gap-6">
                     <Link href="/privacy" className="text-dim hover:text-white" style={{ fontSize: '0.75rem' }}>Privacy Policy</Link>
                     <Link href="/terms" className="text-dim hover:text-white" style={{ fontSize: '0.75rem' }}>Terms of Use</Link>

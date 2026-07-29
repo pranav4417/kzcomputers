@@ -153,8 +153,8 @@ model Slider {
 
 model Appearance {
   id             Int      @id @default(autoincrement())
-  primaryColor   String   @default("#6C63FF") @map("primary_color")
-  secondaryColor String   @default("#FF6584") @map("secondary_color")
+  primaryColor   String   @default("#003B73") @map("primary_color")
+  secondaryColor String   @default("#6C757D") @map("secondary_color")
   fontFamily     String   @default("Inter, sans-serif") @map("font_family")
   darkMode       Boolean  @default(true) @map("dark_mode")
   updatedAt      DateTime @updatedAt @map("updated_at")

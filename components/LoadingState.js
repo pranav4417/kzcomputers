@@ -18,7 +18,7 @@ export default function LoadingState({ message = 'Loading...' }) {
                 size={40}
                 style={{
                     animation: 'spin 1s linear infinite',
-                    color: 'var(--primary, #6C63FF)'
+                    color: 'var(--primary, #003B73)'
                 }}
             />
             <p style={{

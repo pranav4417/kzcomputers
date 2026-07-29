@@ -37,7 +37,7 @@ export default function Hero() {
                     style={{ maxWidth: '48rem', margin: '0 auto 2rem' }}
                 >
                     Premium computer services, CCTV solutions, and custom PC building.
-                    Suraksha Group delivers excellence in every repair and installation.
+                    KZ COMPUTERS delivers excellence in every repair and installation.
                 </motion.p>
 
                 <motion.div

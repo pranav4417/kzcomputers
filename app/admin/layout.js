@@ -184,9 +184,9 @@ export default function AdminLayout({ children }) {
 
     if (loading) {
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#0a0a0f', color: '#fff' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#1A202C', color: '#fff' }}>
                 <div style={{ textAlign: 'center' }}>
-                    <div style={{ width: '50px', height: '50px', border: '3px solid #6C63FF', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }}></div>
+                    <div style={{ width: '50px', height: '50px', border: '3px solid #003B73', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }}></div>
                     <p>Loading...</p>
                     <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                 </div>
@@ -234,7 +234,7 @@ export default function AdminLayout({ children }) {
                         <div style={{ padding: '2rem', display: 'flex', alignItems: 'center', gap: '0.75rem', borderBottom: '1px solid var(--border-glass)' }}>
                             <img
                                 src="/logo/logo small square.png"
-                                alt="Suraksha Logo"
+                                alt="KZ COMPUTERS Logo"
                                 style={{ width: '42px', height: '42px', objectFit: 'contain' }}
                             />
                             <span style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.025em' }}>CONTROL</span>
@@ -335,7 +335,7 @@ export default function AdminLayout({ children }) {
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             style={{
-                                background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+                                background: 'linear-gradient(135deg, #1A202C 0%, #1A202C 100%)',
                                 padding: '2.5rem',
                                 borderRadius: '1rem',
                                 maxWidth: '400px',
@@ -384,14 +384,14 @@ export default function AdminLayout({ children }) {
                                     style={{
                                         padding: '0.75rem 1.5rem',
                                         borderRadius: '0.5rem',
-                                        border: '1px solid #ff6584',
+                                        border: '1px solid #6C757D',
                                         background: 'transparent',
-                                        color: '#ff6584',
+                                        color: '#6C757D',
                                         cursor: 'pointer',
                                         fontWeight: '600',
                                         transition: 'all 0.2s'
                                     }}
-                                    onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(255, 101, 132, 0.1)'; }}
+                                    onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(108, 117, 125, 0.1)'; }}
                                     onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; }}
                                 >
                                     Logout Now
@@ -402,7 +402,7 @@ export default function AdminLayout({ children }) {
                                         padding: '0.75rem 1.5rem',
                                         borderRadius: '0.5rem',
                                         border: 'none',
-                                        background: 'linear-gradient(135deg, #6C63FF, #8B83FF)',
+                                        background: 'linear-gradient(135deg, #003B73, #0082C8)',
                                         color: '#fff',
                                         cursor: 'pointer',
                                         fontWeight: '600',

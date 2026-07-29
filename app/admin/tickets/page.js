@@ -626,7 +626,7 @@ export default function TicketManagement() {
                             exit={{ x: '100%' }}
                             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
                             style={{
-                                background: '#0a0a0f',
+                                background: '#1A202C',
                                 borderLeft: '1px solid var(--border-glass)',
                                 width: '95%',
                                 maxWidth: '900px',

@@ -20,7 +20,7 @@ export default async function Home() {
         {/* About Section - Brief */}
         <section className="section-padding container flex flex-col items-center text-center">
           <div className="glass p-8" style={{ maxWidth: '64rem', borderColor: 'var(--primary-glow)' }}>
-            <h2 className="title-lg mb-6">Why Choose <span className="gradient-text">Suraksha</span>?</h2>
+            <h2 className="title-lg mb-6">Why Choose <span className="gradient-text">KZ COMPUTERS</span>?</h2>
             <p className="text-dim mb-8" style={{ fontSize: '1.125rem', maxWidth: '48rem', margin: '0 auto 2.5rem' }}>
               With over a decade of experience in the IT industry, we provide unmatched
               technical expertise and customer support. Our technicians are certified

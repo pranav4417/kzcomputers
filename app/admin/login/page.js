@@ -55,7 +55,7 @@ export default function AdminLogin() {
                     <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2.5rem', textDecoration: 'none' }}>
                         <img
                             src="/logo/logo horizontal.png"
-                            alt="Suraksha Logo"
+                            alt="KZ COMPUTERS Logo"
                             style={{ height: '65px', width: 'auto', objectFit: 'contain' }}
                         />
                     </Link>
@@ -65,7 +65,7 @@ export default function AdminLogin() {
                         <span className="gradient-text">Center</span>
                     </h1>
                     <p className="text-dim" style={{ fontSize: '1.125rem', lineHeight: 1.6, marginTop: '1.5rem', marginBottom: '3rem', maxWidth: '24rem' }}>
-                        Secure access gateway for Suraksha administration and technical support staff.
+                        Secure access gateway for KZ COMPUTERS administration and technical support staff.
                     </p>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -156,7 +156,7 @@ export default function AdminLogin() {
 
                         <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
                             <p style={{ fontSize: '0.625rem', fontWeight: 'bold', color: 'var(--text-dim)', margin: 0 }}>
-                                Protected by Suraksha Internal Systems • {new Date().getFullYear()}
+                                Protected by KZ COMPUTERS Internal Systems • {new Date().getFullYear()}
                             </p>
                         </div>
                     </div>

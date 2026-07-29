@@ -8,8 +8,8 @@ import { useRouter } from 'next/navigation';
 export default function AppearanceManagement() {
     const router = useRouter();
     const [config, setConfig] = useState({
-        primary: '#6c63ff',
-        secondary: '#ff6584',
+        primary: '#003B73',
+        secondary: '#6C757D',
         font: 'Inter',
         mode: 'dark'
     });

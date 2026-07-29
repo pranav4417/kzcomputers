@@ -121,8 +121,8 @@ export default function AdminRegister() {
                         <div>
                             <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-dim)', marginBottom: '0.5rem' }}>Role Request</label>
                             <select value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })} style={{ width: '100%', padding: '0.875rem 1rem', background: 'rgba(0, 0, 0, 0.2)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0.75rem', color: '#fff', fontSize: '0.875rem', outline: 'none' }}>
-                                <option value="agent" style={{ background: '#0a0a0f' }}>Agent</option>
-                                <option value="admin" style={{ background: '#0a0a0f' }}>Admin</option>
+                                <option value="agent" style={{ background: '#1A202C' }}>Agent</option>
+                                <option value="admin" style={{ background: '#1A202C' }}>Admin</option>
                             </select>
                         </div>
                         <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '1rem', borderRadius: '0.75rem', fontWeight: 900, fontSize: '0.875rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>

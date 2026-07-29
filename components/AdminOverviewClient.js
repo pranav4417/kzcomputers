@@ -49,14 +49,14 @@ export default function AdminOverviewClient({ stats, recentTickets }) {
                             alignItems: 'center',
                             gap: '0.5rem',
                             padding: '0.75rem 1.25rem',
-                            background: 'linear-gradient(135deg, #6C63FF 0%, #8b7cff 100%)',
+                            background: 'linear-gradient(135deg, #003B73 0%, #0082C8 100%)',
                             border: 'none',
                             borderRadius: '0.75rem',
                             color: 'white',
                             fontWeight: '600',
                             fontSize: '0.875rem',
                             cursor: 'pointer',
-                            boxShadow: '0 4px 15px rgba(108, 99, 255, 0.3)',
+                            boxShadow: '0 4px 15px rgba(0, 59, 115, 0.3)',
                             transition: 'all 0.2s ease'
                         }}
                         className="export-btn"
@@ -127,14 +127,14 @@ export default function AdminOverviewClient({ stats, recentTickets }) {
                                 <tbody>
                                     {recentTickets.map((ticket) => (
                                         <tr key={ticket.id}>
-                                            <td style={{ fontWeight: 'bold', fontSize: '0.875rem', color: 'var(--primary)', fontFamily: 'monospace', letterSpacing: '0.05em', background: 'rgba(99, 102, 241, 0.1)', padding: '0.25rem 0.5rem', borderRadius: '0.375rem', display: 'inline-block' }}>#{ticket.ticketNumber}</td>
+                                            <td style={{ fontWeight: 'bold', fontSize: '0.875rem', color: 'var(--primary)', fontFamily: 'monospace', letterSpacing: '0.05em', background: 'rgba(0, 59, 115, 0.1)', padding: '0.25rem 0.5rem', borderRadius: '0.375rem', display: 'inline-block' }}>#{ticket.ticketNumber}</td>
                                             <td>
                                                 <div style={{ fontSize: '0.875rem', fontWeight: 600 }}>{ticket.customerName}</div>
                                                 <div className="text-dim" style={{ fontSize: '0.65rem', textTransform: 'uppercase' }}>{ticket.email}</div>
                                             </td>
                                             <td style={{ fontSize: '0.875rem', fontWeight: 600 }}>{ticket.serviceType}</td>
                                             <td>
-                                                <span style={{ fontSize: '0.65rem', fontWeight: 'black', padding: '0.25rem 0.5rem', borderRadius: '0.25rem', border: '1px solid', color: ticket.priority === 'High' ? 'var(--secondary)' : 'var(--text-dim)', borderColor: ticket.priority === 'High' ? 'rgba(255, 101, 132, 0.2)' : 'rgba(255,255,255,0.1)', background: ticket.priority === 'High' ? 'rgba(255, 101, 132, 0.1)' : 'transparent' }}>
+                                                <span style={{ fontSize: '0.65rem', fontWeight: 'black', padding: '0.25rem 0.5rem', borderRadius: '0.25rem', border: '1px solid', color: ticket.priority === 'High' ? 'var(--secondary)' : 'var(--text-dim)', borderColor: ticket.priority === 'High' ? 'rgba(108, 117, 125, 0.2)' : 'rgba(255,255,255,0.1)', background: ticket.priority === 'High' ? 'rgba(108, 117, 125, 0.1)' : 'transparent' }}>
                                                     {ticket.priority.toUpperCase()}
                                                 </span>
                                             </td>
@@ -163,7 +163,7 @@ export default function AdminOverviewClient({ stats, recentTickets }) {
                             ))}
                         </div>
 
-                        <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(108, 99, 255, 0.1)', borderRadius: '1rem', border: '1px solid rgba(108, 99, 255, 0.2)', textAlign: 'center' }}>
+                        <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(0, 59, 115, 0.1)', borderRadius: '1rem', border: '1px solid rgba(0, 59, 115, 0.2)', textAlign: 'center' }}>
                             <AlertCircle size={40} className="text-primary mx-auto mb-4" />
                             <h4 style={{ fontWeight: 'bold', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Technician Alert</h4>
                             <p className="text-dim" style={{ fontSize: '0.65rem', lineHeight: 1.6 }}>
@@ -183,7 +183,7 @@ export default function AdminOverviewClient({ stats, recentTickets }) {
             <style jsx global>{`
                 .export-btn:hover {
                     transform: translateY(-2px);
-                    box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4) !important;
+                    box-shadow: 0 6px 20px rgba(0, 59, 115, 0.4) !important;
                 }
             `}</style>
         </>

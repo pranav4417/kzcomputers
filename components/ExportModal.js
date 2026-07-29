@@ -286,9 +286,9 @@ export default function ExportModal({ isOpen, onClose }) {
             />
 
             {/* Modal */}
-            <div className="relative w-full max-w-4xl max-h-[90vh] bg-[#0a0a0f] border border-[#2a2a3a] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+            <div className="relative w-full max-w-4xl max-h-[90vh] bg-[#1A202C] border border-[#2d3748] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
                 {/* Header */}
-                <div className="flex items-center justify-between px-8 py-6 border-b border-[#2a2a3a] bg-gradient-to-r from-[#1a1a2e] to-[#0a0a0f]">
+                <div className="flex items-center justify-between px-8 py-6 border-b border-[#2d3748] bg-gradient-to-r from-[#1A202C] to-[#1A202C]">
                     <div>
                         <h2 className="text-2xl font-bold text-white">Export Data</h2>
                         <p className="text-sm text-gray-400 mt-1">
@@ -299,26 +299,26 @@ export default function ExportModal({ isOpen, onClose }) {
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 hover:bg-[#2a2a3a] rounded-lg transition-colors"
+                        className="p-2 hover:bg-[#2d3748] rounded-lg transition-colors"
                     >
                         <X className="w-5 h-5 text-gray-400" />
                     </button>
                 </div>
 
                 {/* Progress Steps */}
-                <div className="flex items-center justify-center gap-2 py-4 border-b border-[#2a2a3a] bg-[#0f0f1a]">
+                <div className="flex items-center justify-center gap-2 py-4 border-b border-[#2d3748] bg-[#1A202C]">
                     {[1, 2, 3].map((s) => (
                         <div key={s} className="flex items-center">
                             <div className={`
                 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold
                 ${step >= s
-                                    ? 'bg-[#6C63FF] text-white'
-                                    : 'bg-[#2a2a3a] text-gray-500'}
+                                    ? 'bg-[#003B73] text-white'
+                                    : 'bg-[#2d3748] text-gray-500'}
               `}>
                                 {step > s ? <Check className="w-4 h-4" /> : s}
                             </div>
                             {s < 3 && (
-                                <div className={`w-16 h-0.5 mx-2 ${step > s ? 'bg-[#6C63FF]' : 'bg-[#2a2a3a]'}`} />
+                                <div className={`w-16 h-0.5 mx-2 ${step > s ? 'bg-[#003B73]' : 'bg-[#2d3748]'}`} />
                             )}
                         </div>
                     ))}
@@ -341,14 +341,14 @@ export default function ExportModal({ isOpen, onClose }) {
                                         className={`
                       p-6 rounded-xl border-2 text-left transition-all duration-200
                       ${selectedEntity === entity.key
-                                                ? 'border-[#6C63FF] bg-[#6C63FF]/10 shadow-lg shadow-[#6C63FF]/20'
-                                                : 'border-[#2a2a3a] hover:border-[#4a4a5a] hover:bg-[#1a1a2e]'
+                                                ? 'border-[#003B73] bg-[#003B73]/10 shadow-lg shadow-[#003B73]/20'
+                                                : 'border-[#2d3748] hover:border-[#4a5568] hover:bg-[#1A202C]'
                                             }
                     `}
                                     >
                                         <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${selectedEntity === entity.key
-                                                ? 'bg-[#6C63FF]/20 text-[#6C63FF]'
-                                                : 'bg-[#2a2a3a] text-gray-400'
+                                                ? 'bg-[#003B73]/20 text-[#003B73]'
+                                                : 'bg-[#2d3748] text-gray-400'
                                             }`}>
                                             <Icon className="w-6 h-6" />
                                         </div>
@@ -370,13 +370,13 @@ export default function ExportModal({ isOpen, onClose }) {
                                 <div className="flex gap-2">
                                     <button
                                         onClick={handleSelectAllFields}
-                                        className="px-3 py-1.5 text-sm bg-[#2a2a3a] hover:bg-[#3a3a4a] text-gray-300 rounded-lg transition-colors"
+                                        className="px-3 py-1.5 text-sm bg-[#2d3748] hover:bg-[#3a3a4a] text-gray-300 rounded-lg transition-colors"
                                     >
                                         Select All
                                     </button>
                                     <button
                                         onClick={handleDeselectAllFields}
-                                        className="px-3 py-1.5 text-sm bg-[#2a2a3a] hover:bg-[#3a3a4a] text-gray-300 rounded-lg transition-colors"
+                                        className="px-3 py-1.5 text-sm bg-[#2d3748] hover:bg-[#3a3a4a] text-gray-300 rounded-lg transition-colors"
                                     >
                                         Deselect All
                                     </button>
@@ -390,15 +390,15 @@ export default function ExportModal({ isOpen, onClose }) {
                                         className={`
                       flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all
                       ${selectedFields.includes(field.key)
-                                                ? 'border-[#6C63FF] bg-[#6C63FF]/10'
-                                                : 'border-[#2a2a3a] hover:border-[#4a4a5a]'
+                                                ? 'border-[#003B73] bg-[#003B73]/10'
+                                                : 'border-[#2d3748] hover:border-[#4a5568]'
                                             }
                     `}
                                     >
                                         <div className={`
                       w-5 h-5 rounded border-2 flex items-center justify-center transition-colors
                       ${selectedFields.includes(field.key)
-                                                ? 'bg-[#6C63FF] border-[#6C63FF]'
+                                                ? 'bg-[#003B73] border-[#003B73]'
                                                 : 'border-gray-500'
                                             }
                     `}>
@@ -442,7 +442,7 @@ export default function ExportModal({ isOpen, onClose }) {
                                 </button>
 
                                 {showAdvancedFilters && (
-                                    <div className="grid grid-cols-2 gap-4 p-6 bg-[#1a1a2e] rounded-xl border border-[#2a2a3a]">
+                                    <div className="grid grid-cols-2 gap-4 p-6 bg-[#1A202C] rounded-xl border border-[#2d3748]">
                                         {ENTITY_FILTERS[selectedEntity]?.map((filter) => (
                                             <div key={filter.key}>
                                                 <label className="block text-sm text-gray-400 mb-2">{filter.label}</label>
@@ -450,7 +450,7 @@ export default function ExportModal({ isOpen, onClose }) {
                                                     <select
                                                         value={filters[filter.key] || ''}
                                                         onChange={(e) => handleFilterChange(filter.key, e.target.value)}
-                                                        className="w-full px-4 py-2.5 bg-[#0a0a0f] border border-[#2a2a3a] rounded-lg text-white text-sm focus:border-[#6C63FF] focus:outline-none"
+                                                        className="w-full px-4 py-2.5 bg-[#1A202C] border border-[#2d3748] rounded-lg text-white text-sm focus:border-[#003B73] focus:outline-none"
                                                     >
                                                         <option value="">All</option>
                                                         {filter.options.map((opt) => (
@@ -466,7 +466,7 @@ export default function ExportModal({ isOpen, onClose }) {
                                                         value={filters[filter.key] || ''}
                                                         onChange={(e) => handleFilterChange(filter.key, e.target.value)}
                                                         placeholder="Enter value..."
-                                                        className="w-full px-4 py-2.5 bg-[#0a0a0f] border border-[#2a2a3a] rounded-lg text-white text-sm focus:border-[#6C63FF] focus:outline-none"
+                                                        className="w-full px-4 py-2.5 bg-[#1A202C] border border-[#2d3748] rounded-lg text-white text-sm focus:border-[#003B73] focus:outline-none"
                                                     />
                                                 )}
                                                 {filter.type === 'number' && (
@@ -475,7 +475,7 @@ export default function ExportModal({ isOpen, onClose }) {
                                                         value={filters[filter.key] || ''}
                                                         onChange={(e) => handleFilterChange(filter.key, e.target.value)}
                                                         placeholder="Enter value..."
-                                                        className="w-full px-4 py-2.5 bg-[#0a0a0f] border border-[#2a2a3a] rounded-lg text-white text-sm focus:border-[#6C63FF] focus:outline-none"
+                                                        className="w-full px-4 py-2.5 bg-[#1A202C] border border-[#2d3748] rounded-lg text-white text-sm focus:border-[#003B73] focus:outline-none"
                                                     />
                                                 )}
                                                 {filter.type === 'datePreset' && (
@@ -483,7 +483,7 @@ export default function ExportModal({ isOpen, onClose }) {
                                                         <select
                                                             value={filters.datePreset || ''}
                                                             onChange={(e) => handleFilterChange('datePreset', e.target.value)}
-                                                            className="flex-1 px-4 py-2.5 bg-[#0a0a0f] border border-[#2a2a3a] rounded-lg text-white text-sm focus:border-[#6C63FF] focus:outline-none"
+                                                            className="flex-1 px-4 py-2.5 bg-[#1A202C] border border-[#2d3748] rounded-lg text-white text-sm focus:border-[#003B73] focus:outline-none"
                                                         >
                                                             {DATE_PRESETS.map((preset) => (
                                                                 <option key={preset.value} value={preset.value}>
@@ -497,13 +497,13 @@ export default function ExportModal({ isOpen, onClose }) {
                                                                     type="date"
                                                                     value={filters.dateFrom || ''}
                                                                     onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
-                                                                    className="flex-1 px-4 py-2.5 bg-[#0a0a0f] border border-[#2a2a3a] rounded-lg text-white text-sm focus:border-[#6C63FF] focus:outline-none"
+                                                                    className="flex-1 px-4 py-2.5 bg-[#1A202C] border border-[#2d3748] rounded-lg text-white text-sm focus:border-[#003B73] focus:outline-none"
                                                                 />
                                                                 <input
                                                                     type="date"
                                                                     value={filters.dateTo || ''}
                                                                     onChange={(e) => handleFilterChange('dateTo', e.target.value)}
-                                                                    className="flex-1 px-4 py-2.5 bg-[#0a0a0f] border border-[#2a2a3a] rounded-lg text-white text-sm focus:border-[#6C63FF] focus:outline-none"
+                                                                    className="flex-1 px-4 py-2.5 bg-[#1A202C] border border-[#2d3748] rounded-lg text-white text-sm focus:border-[#003B73] focus:outline-none"
                                                                 />
                                                             </>
                                                         )}
@@ -533,12 +533,12 @@ export default function ExportModal({ isOpen, onClose }) {
                                                 className={`
                           p-4 rounded-xl border-2 text-left transition-all
                           ${format === fmt.key
-                                                        ? 'border-[#6C63FF] bg-[#6C63FF]/10'
-                                                        : 'border-[#2a2a3a] hover:border-[#4a4a5a]'
+                                                        ? 'border-[#003B73] bg-[#003B73]/10'
+                                                        : 'border-[#2d3748] hover:border-[#4a5568]'
                                                     }
                         `}
                                             >
-                                                <Icon className={`w-8 h-8 mb-3 ${format === fmt.key ? 'text-[#6C63FF]' : 'text-gray-400'}`} />
+                                                <Icon className={`w-8 h-8 mb-3 ${format === fmt.key ? 'text-[#003B73]' : 'text-gray-400'}`} />
                                                 <h4 className="font-medium text-white">{fmt.label}</h4>
                                                 <p className="text-xs text-gray-500 mt-1">{fmt.description}</p>
                                             </button>
@@ -548,7 +548,7 @@ export default function ExportModal({ isOpen, onClose }) {
                             </div>
 
                             {/* Export Summary */}
-                            <div className="mt-8 p-6 bg-[#1a1a2e] rounded-xl border border-[#2a2a3a]">
+                            <div className="mt-8 p-6 bg-[#1A202C] rounded-xl border border-[#2d3748]">
                                 <h4 className="font-semibold text-white mb-4">Export Summary</h4>
                                 <div className="grid grid-cols-2 gap-4 text-sm">
                                     <div>
@@ -576,14 +576,14 @@ export default function ExportModal({ isOpen, onClose }) {
 
                             {/* Export Progress */}
                             {isExporting && (
-                                <div className="mt-6 p-4 bg-[#1a1a2e] rounded-xl border border-[#6C63FF]">
+                                <div className="mt-6 p-4 bg-[#1A202C] rounded-xl border border-[#003B73]">
                                     <div className="flex items-center justify-between mb-2">
                                         <span className="text-sm text-white">Exporting data...</span>
-                                        <span className="text-sm text-[#6C63FF]">{exportProgress}%</span>
+                                        <span className="text-sm text-[#003B73]">{exportProgress}%</span>
                                     </div>
-                                    <div className="w-full h-2 bg-[#2a2a3a] rounded-full overflow-hidden">
+                                    <div className="w-full h-2 bg-[#2d3748] rounded-full overflow-hidden">
                                         <div
-                                            className="h-full bg-[#6C63FF] transition-all duration-300"
+                                            className="h-full bg-[#003B73] transition-all duration-300"
                                             style={{ width: `${exportProgress}%` }}
                                         />
                                     </div>
@@ -594,7 +594,7 @@ export default function ExportModal({ isOpen, onClose }) {
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-between px-8 py-6 border-t border-[#2a2a3a] bg-[#0a0a0f]">
+                <div className="flex items-center justify-between px-8 py-6 border-t border-[#2d3748] bg-[#1A202C]">
                     <button
                         onClick={() => step > 1 ? setStep(step - 1) : onClose()}
                         className="px-6 py-2.5 text-gray-400 hover:text-white transition-colors"
@@ -609,8 +609,8 @@ export default function ExportModal({ isOpen, onClose }) {
                             className={`
                 px-6 py-2.5 rounded-lg font-medium flex items-center gap-2 transition-all
                 ${step === 1 && !selectedEntity
-                                    ? 'bg-[#2a2a3a] text-gray-500 cursor-not-allowed'
-                                    : 'bg-[#6C63FF] hover:bg-[#5a52e0] text-white'
+                                    ? 'bg-[#2d3748] text-gray-500 cursor-not-allowed'
+                                    : 'bg-[#003B73] hover:bg-[#002855] text-white'
                                 }
               `}
                         >
@@ -624,8 +624,8 @@ export default function ExportModal({ isOpen, onClose }) {
                             className={`
                 px-8 py-2.5 rounded-lg font-medium flex items-center gap-2 transition-all
                 ${isExporting || selectedFields.length === 0
-                                    ? 'bg-[#2a2a3a] text-gray-500 cursor-not-allowed'
-                                    : 'bg-gradient-to-r from-[#6C63FF] to-[#8b7cff] hover:from-[#5a52e0] hover:to-[#7a6ce0] text-white shadow-lg shadow-[#6C63FF]/30'
+                                    ? 'bg-[#2d3748] text-gray-500 cursor-not-allowed'
+                                    : 'bg-gradient-to-r from-[#003B73] to-[#0082C8] hover:from-[#002855] hover:to-[#0082C8] text-white shadow-lg shadow-[#003B73]/30'
                                 }
               `}
                         >
