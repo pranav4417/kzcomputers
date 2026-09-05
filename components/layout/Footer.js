@@ -56,7 +56,7 @@ export default function Footer() {
                     <ul className="flex flex-col gap-4">
                         <li className="flex items-start gap-2">
                             <MapPin size={20} className="text-primary" style={{ flexShrink: 0 }} />
-                            <span className="text-dim" style={{ fontSize: '0.875rem' }}>#42, 1st Floor, Tech Circle, Bangalore 560001</span>
+                            <span className="text-dim" style={{ fontSize: '0.875rem' }}>NO.483 & 484, Nimishamba, Square Amrutahalli, Amruthahalli, Bangalore, Bangalore North, Karnataka, India, 560092</span>
                         </li>
                         <li className="flex items-center gap-2">
                             <Phone size={20} className="text-primary" style={{ flexShrink: 0 }} />
@@ -72,9 +72,9 @@ export default function Footer() {
 
             <div className="container pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
                 <p className="text-dim" style={{ fontSize: '0.75rem' }}>&copy; 2026 KZ COMPUTERS. All rights reserved.</p>
-                <div className="flex gap-6">
-                    <Link href="/privacy" className="text-dim hover:text-white" style={{ fontSize: '0.75rem' }}>Privacy Policy</Link>
-                    <Link href="/terms" className="text-dim hover:text-white" style={{ fontSize: '0.75rem' }}>Terms of Use</Link>
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                    <span className="text-dim" style={{ fontSize: '0.65rem' }}>GSTIN: 29AANCK0673R1ZL</span>
+                    <span className="text-dim" style={{ fontSize: '0.65rem' }}>CIN: U62099KA2026PTC224499</span>
                 </div>
             </div>
         </footer>
