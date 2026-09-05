@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, User, Phone, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react';
 

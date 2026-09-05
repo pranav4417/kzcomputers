@@ -12,7 +12,6 @@ cloudinary.config({
 
 export async function DELETE(req, { params }) {
     try {
-        // Check authentication
         const session = await requireAuth(['admin', 'superadmin']);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 });
@@ -42,7 +41,6 @@ export async function DELETE(req, { params }) {
 
 export async function PATCH(req, { params }) {
     try {
-        // Check authentication
         const session = await requireAuth(['admin', 'superadmin']);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 });
@@ -54,21 +52,28 @@ export async function PATCH(req, { params }) {
         const name = formData.get('name');
         const description = formData.get('description');
         const price = formData.get('price');
+        const category = formData.get('category');
+        const stock = formData.get('stock');
+        const featured = formData.get('featured');
+        const displayOrder = formData.get('displayOrder');
+        const isActive = formData.get('isActive');
         const image = formData.get('image');
 
-        // Build update data
         const updateData = {};
         if (name) updateData.name = name;
-        if (description) updateData.description = description;
+        if (description !== null) updateData.description = description;
         if (price) updateData.price = parseFloat(price);
+        if (category !== null) updateData.category = category;
+        if (stock !== null) updateData.stock = parseInt(stock);
+        if (featured !== null) updateData.featured = featured === 'true';
+        if (displayOrder !== null) updateData.displayOrder = parseInt(displayOrder);
+        if (isActive !== null) updateData.isActive = isActive === 'true';
 
-        // Handle image upload if provided
         if (image && typeof image !== 'string') {
             const bytes = await image.arrayBuffer();
             const buffer = Buffer.from(bytes);
             const fileName = `${Date.now()}-${image.name}`;
 
-            // Upload to Cloudinary
             const uploadResult = await new Promise((resolve, reject) => {
                 cloudinary.uploader.upload_stream(
                     {

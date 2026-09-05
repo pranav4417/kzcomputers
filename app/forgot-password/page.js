@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, Mail, Phone, Lock, Loader2, ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
 
 export default function ForgotPassword() {
     const [step, setStep] = useState(1);

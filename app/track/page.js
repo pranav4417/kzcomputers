@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
 import { Search, Loader2 } from 'lucide-react';
 
 export default function TrackSearch() {

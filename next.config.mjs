@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   images: {
     remotePatterns: [
       {
@@ -8,7 +9,9 @@ const nextConfig = {
         pathname: '/**',
       },
     ],
+    unoptimized: process.env.NODE_ENV === 'production',
   },
+  compress: true,
 };
 
 export default nextConfig;

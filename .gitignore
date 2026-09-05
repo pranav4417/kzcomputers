@@ -1,3 +1,46 @@
+# Dependencies
 node_modules
+
+# Build outputs
 .next
+out
+
+# Environment variables
 .env
+.env.local
+.env.production
+.env.development
+
+# Database
+*.db
+*.sqlite
+prisma/dev.db
+
+# Backups and dumps
+backups/
+dump.sql
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea
+.vscode
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Vercel
+.vercel
+
+# Testing
+coverage
+
+# Temporary files
+tmp/
+temp/

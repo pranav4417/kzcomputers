@@ -10,11 +10,44 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-export async function GET() {
-    // Public endpoint - anyone can view products
+export async function GET(req) {
     try {
-        const products = await prisma.product.findMany({ orderBy: { createdAt: 'desc' } });
-        return NextResponse.json(products);
+        const { searchParams } = new URL(req.url);
+        const search = searchParams.get('search') || '';
+        const category = searchParams.get('category') || '';
+        const featured = searchParams.get('featured');
+        const active = searchParams.get('active');
+        const sort = searchParams.get('sort') || 'displayOrder';
+        const order = searchParams.get('order') || 'asc';
+        const limit = parseInt(searchParams.get('limit')) || 50;
+        const offset = parseInt(searchParams.get('offset')) || 0;
+
+        const where = {
+            ...(search ? { name: { contains: search, mode: 'insensitive' } } : {}),
+            ...(category ? { category } : {}),
+            ...(featured !== null && featured !== '' ? { featured: featured === 'true' } : {}),
+            ...(active !== null && active !== '' ? { isActive: active === 'true' } : {}),
+        };
+
+        const orderBy = {
+            ...(sort === 'price' ? { price: order } : {}),
+            ...(sort === 'name' ? { name: order } : {}),
+            ...(sort === 'createdAt' ? { createdAt: order } : {}),
+            ...(sort === 'displayOrder' ? { displayOrder: order } : {}),
+            ...(sort === 'featured' ? { featured: order } : {}),
+        };
+
+        const [products, total] = await Promise.all([
+            prisma.product.findMany({
+                where,
+                orderBy: Object.keys(orderBy).length > 0 ? orderBy : { displayOrder: 'asc', createdAt: 'desc' },
+                take: limit,
+                skip: offset,
+            }).then(rows => rows.map(p => ({ ...p, price: p.price != null ? Number(p.price) : null }))),
+            prisma.product.count({ where }),
+        ]);
+
+        return NextResponse.json({ products, total, limit, offset });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
     }
@@ -22,7 +55,6 @@ export async function GET() {
 
 export async function POST(req) {
     try {
-        // Check authentication
         const session = await requireAuth(['admin', 'superadmin']);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 });
@@ -32,6 +64,11 @@ export async function POST(req) {
         const name = formData.get('name');
         const description = formData.get('description');
         const price = formData.get('price');
+        const category = formData.get('category') || 'General';
+        const stock = parseInt(formData.get('stock')) || 0;
+        const featured = formData.get('featured') === 'true';
+        const displayOrder = parseInt(formData.get('displayOrder')) || 0;
+        const isActive = formData.get('isActive') !== 'false';
         const image = formData.get('image');
 
         let imagePath = null;
@@ -40,7 +77,6 @@ export async function POST(req) {
             const buffer = Buffer.from(bytes);
             const fileName = `${Date.now()}-${image.name}`;
 
-            // Upload to Cloudinary
             const uploadResult = await new Promise((resolve, reject) => {
                 cloudinary.uploader.upload_stream(
                     {
@@ -61,7 +97,7 @@ export async function POST(req) {
             await prisma.pendingUpdate.create({
                 data: {
                     entityType: 'Product_Create',
-                    data: JSON.stringify({ name, description, price: parseFloat(price), image: imagePath }),
+                    data: JSON.stringify({ name, description, price: parseFloat(price), category, stock, featured, displayOrder, isActive, image: imagePath }),
                     submittedBy: session.id,
                     status: 'Pending'
                 }
@@ -70,7 +106,7 @@ export async function POST(req) {
         }
 
         const product = await prisma.product.create({
-            data: { name, description, price: parseFloat(price), image: imagePath }
+            data: { name, description, price: parseFloat(price), category, stock, featured, displayOrder, isActive, image: imagePath }
         });
 
         return NextResponse.json({ success: true, product });

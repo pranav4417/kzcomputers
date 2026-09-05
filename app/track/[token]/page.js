@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 import React from 'react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
 import prisma from '@/lib/prisma';
 import { Calendar, Clock, User, Package, Settings, MessageCircle, ArrowLeft, FileText } from 'lucide-react';
 import Link from 'next/link';

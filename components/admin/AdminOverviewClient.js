@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import ExportModal from '@/components/ExportModal';
+import ExportModal from '@/components/admin/ExportModal';
 
 export default function AdminOverviewClient({ stats, recentTickets }) {
     const [showExportModal, setShowExportModal] = useState(false);

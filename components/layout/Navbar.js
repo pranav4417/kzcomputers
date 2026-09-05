@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, Shield, Monitor, Hammer, Settings, LogIn, Sun, Moon, LogOut, User } from 'lucide-react';
+import { Menu, X, Shield, Monitor, Ticket, Hammer, Settings, LogIn, Sun, Moon, LogOut, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from './ThemeProvider';
+import { useTheme } from '../ThemeProvider';
 
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
@@ -88,11 +88,11 @@ export default function Navbar() {
                             }} className="flex items-center gap-2 hover:bg-gray-700/30 rounded-full p-1 transition-colors">
                                 {/* User Avatar */}
                                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-700/20 text-gray-200">
-                                    {user.username ? user.username.substring(0, 2).toUpperCase() : 'US'}
+                                    {(user.username || user.name || user.email || 'U').substring(0, 2).toUpperCase()}
                                 </div>
                                 <div className="hidden md:block">
                                     <div className="flex flex-col items-start">
-                                        <span className="text-sm font-medium">{user.username}</span>
+                                        <span className="text-sm font-medium">{user.username || user.name || user.email}</span>
                                         <span className="text-xs text-gray-400 capitalize">{user.role}</span>
                                     </div>
                                     <svg className="ml-2 h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,38 +102,38 @@ export default function Navbar() {
                             </button>
 
                             {/* Profile Dropdown Menu */}
-                            <div className={`absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-gray-800/90 backdrop-blur-md py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${profileMenuOpen ? 'block' : 'hidden'}`}>
+                            <div className={`absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-gray-800/95 backdrop-blur-xl py-1 shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none z-[9999] ${profileMenuOpen ? 'block' : 'hidden'}`}>
                                 <div className="px-3 py-2">
                                     {/* User Info */}
                                     <div className="flex items-center space-x-3 text-sm font-medium text-white">
                                         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-700/30 text-gray-200">
-                                            {user.username ? user.username.substring(0, 2).toUpperCase() : 'US'}
+                                            {(user.username || user.name || user.email || 'U').substring(0, 2).toUpperCase()}
                                         </div>
                                         <div>
-                                            <div className="text-white">{user.username}</div>
+                                            <div className="text-white">{user.username || user.name || user.email}</div>
                                             <div className="text-xs text-gray-400">{user.role}</div>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="border-t border-gray-700/50"></div>
                                 <div className="py-1">
-                                    {/* Dashboard Link (for customers) */}
-                                    {user.role === 'customer' && (
-                                        <Link href="/dashboard" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
-                                            <User className="mr-3 h-4 w-4" /> Dashboard
-                                        </Link>
-                                    )}
-                                    {/* Admin/Agent Links */}
-                                    {(user.role === 'admin' || user.role === 'agent') && (
-                                        <>
-                                            <Link href="/admin" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
-                                                <Monitor className="mr-3 h-4 w-4" /> Admin Panel
-                                            </Link>
-                                            <Link href="/admin/tickets" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
-                                                <Ticket className="mr-3 h-4 w-4" /> Tickets
-                                            </Link>
-                                        </>
-                                    )}
+                                     {/* Dashboard Link (for customers) */}
+                                     {user.role === 'customer' && (
+                                         <Link href="/dashboard" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
+                                             <User className="mr-3 h-4 w-4" /> Dashboard
+                                         </Link>
+                                     )}
+                                     {/* Admin/Agent/Superadmin Links */}
+                                     {(user.role === 'admin' || user.role === 'agent' || user.role === 'superadmin') && (
+                                         <>
+                                             <Link href="/admin" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
+                                                 <Monitor className="mr-3 h-4 w-4" /> Admin Panel
+                                             </Link>
+                                             <Link href="/admin/tickets" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
+                                                 <Ticket className="mr-3 h-4 w-4" /> Tickets
+                                             </Link>
+                                         </>
+                                     )}
                                     {/* Settings Link */}
                                     <Link href="/admin/appearance" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
                                         <Settings className="mr-3 h-4 w-4" /> Settings

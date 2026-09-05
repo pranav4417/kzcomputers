@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 import React from 'react';
 import prisma from '@/lib/prisma';
-import AdminOverviewClient from '@/components/AdminOverviewClient';
+import AdminOverviewClient from '@/components/admin/AdminOverviewClient';
 import { getSession } from '@/lib/auth';
 
 export default async function AdminOverview() {

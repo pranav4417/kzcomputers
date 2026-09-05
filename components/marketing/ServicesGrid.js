@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma';
 import { Laptop, Camera, Printer, Cpu, Database, Network, Monitor, X } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from './ThemeProvider';
+import { useTheme } from '../ThemeProvider';
 
 const iconMap = {
     'Laptop': Laptop,

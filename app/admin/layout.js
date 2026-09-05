@@ -7,7 +7,8 @@ import {
     Shield, LayoutDashboard, Ticket, Package, Hammer, Palette, Users, LogOut, Menu, X, Download, Settings, Clock, AlertTriangle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import ErrorBoundary from '@/components/ErrorBoundary';
+import ErrorBoundary from '@/components/ui/ErrorBoundary';
+import ThemeToggle from '@/components/ThemeToggle';
 
 // Session timeout constants (in milliseconds)
 const INACTIVITY_WARNING_DELAY = 60 * 1000; // 1 minute of inactivity before showing warning
@@ -281,14 +282,17 @@ export default function AdminLayout({ children }) {
             {/* Main Content */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, height: '100vh' }}>
                 <header style={{ height: '5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2rem', background: 'rgba(0, 0, 0, 0.2)', borderBottom: '1px solid var(--border-glass)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
-                    <button
-                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        style={{ padding: '0.5rem', borderRadius: '0.5rem', color: 'var(--text-main)' }}
-                        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
-                        onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
-                    >
-                        {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <button
+                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                            style={{ padding: '0.5rem', borderRadius: '0.5rem', color: 'var(--text-main)' }}
+                            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                            onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                        >
+                            {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+                        </button>
+                        <ThemeToggle />
+                    </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <div style={{ textAlign: 'right' }}>

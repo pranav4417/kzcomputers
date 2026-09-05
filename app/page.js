@@ -1,13 +1,25 @@
 export const dynamic = 'force-dynamic';
-import Navbar from '@/components/Navbar';
-import Hero from '@/components/Hero';
-import ServicesGrid from '@/components/ServicesGrid';
-import ProductsGrid from '@/components/ProductsGrid';
-import Footer from '@/components/Footer';
+import Navbar from '@/components/layout/Navbar';
+import Hero from '@/components/layout/Hero';
+import ServicesGrid from '@/components/marketing/ServicesGrid';
+import ProductsGrid from '@/components/marketing/ProductsGrid';
+import Footer from '@/components/layout/Footer';
 import prisma from '@/lib/prisma';
 
 export default async function Home() {
   const services = await prisma.service.findMany();
+  const products = await prisma.product.findMany({
+    where: { isActive: true },
+    orderBy: [
+      { featured: 'desc' },
+      { displayOrder: 'asc' },
+      { createdAt: 'desc' }
+    ],
+    take: 6
+  }).then(rows => rows.map(p => ({
+    ...p,
+    price: p.price != null ? Number(p.price) : null
+  })));
 
   return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -15,7 +27,7 @@ export default async function Home() {
       <Hero />
       <div className="relative">
         <ServicesGrid services={services} />
-        <ProductsGrid />
+        <ProductsGrid initialProducts={products} maxProducts={6} showSeeMore />
 
         {/* About Section - Brief */}
         <section className="section-padding container flex flex-col items-center text-center">
