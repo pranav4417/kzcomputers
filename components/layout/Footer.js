@@ -12,7 +12,8 @@ export default function Footer() {
                         <img
                             src="/logo/logo horizontal.png"
                             alt="KZ COMPUTERS Logo"
-                            style={{ height: '50px', width: 'auto', objectFit: 'contain' }}
+                            style={{ height: '120px', width: '260px', objectFit: 'fill' }}
+
                         />
                     </Link>
                     <p className="text-dim mb-8" style={{ fontSize: '0.875rem' }}>
@@ -27,6 +28,20 @@ export default function Footer() {
                     </div>
                 </div>
 
+                {/* Services */}
+                <div>
+                    <h4 className="title-sm" style={{ color: '#fff', marginBottom: '1.5rem' }}>Services</h4>
+                    <ul className="flex flex-col gap-4">
+                        <li><Link href="/#services" className="text-dim hover:text-white" style={{ transition: 'color 0.3s' }}>Hardware Peripherals</Link></li>
+                        <li><Link href="/#services" className="text-dim hover:text-white" style={{ transition: 'color 0.3s' }}>Software Products</Link></li>
+                        <li><Link href="/#services" className="text-dim hover:text-white" style={{ transition: 'color 0.3s' }}>IT Infrastructure Management</Link></li>
+                        <li><Link href="/#services" className="text-dim hover:text-white" style={{ transition: 'color 0.3s' }}>Network & Cybersecurity</Link></li>
+                        <li><Link href="/#services" className="text-dim hover:text-white" style={{ transition: 'color 0.3s' }}>Enterprise Solutions</Link></li>
+                        <li><Link href="/#services" className="text-dim hover:text-white" style={{ transition: 'color 0.3s' }}>Website Design & Development</Link></li>
+                        <li><Link href="/#services" className="text-dim hover:text-white" style={{ transition: 'color 0.3s' }}>IT Equipment Rentals</Link></li>
+                    </ul>
+                </div>
+
                 {/* Quick Links */}
                 <div>
                     <h4 className="title-sm" style={{ color: '#fff', marginBottom: '1.5rem' }}>Quick Links</h4>
@@ -38,19 +53,6 @@ export default function Footer() {
                         <li><Link href="/about" className="text-dim hover:text-white" style={{ transition: 'color 0.3s' }}>About Us</Link></li>
                     </ul>
                 </div>
-
-                {/* Support */}
-                <div>
-                    <h4 className="title-sm" style={{ color: '#fff', marginBottom: '1.5rem' }}>Support</h4>
-                    <ul className="flex flex-col gap-4">
-                        <li><Link href="/login" className="text-dim hover:text-white" style={{ transition: 'color 0.3s' }}>Customer Login</Link></li>
-                        <li><Link href="/faq" className="text-dim hover:text-white" style={{ transition: 'color 0.3s' }}>FAQs</Link></li>
-                        <li><Link href="/contact" className="text-dim hover:text-white" style={{ transition: 'color 0.3s' }}>Contact Support</Link></li>
-                        <li><Link href="/terms" className="text-dim hover:text-white" style={{ transition: 'color 0.3s' }}>Terms of Service</Link></li>
-                    </ul>
-                </div>
-
-                {/* Contact */}
                 <div>
                     <h4 className="title-sm" style={{ color: '#fff', marginBottom: '1.5rem' }}>Get in Touch</h4>
                     <ul className="flex flex-col gap-4">
@@ -60,11 +62,11 @@ export default function Footer() {
                         </li>
                         <li className="flex items-center gap-2">
                             <Phone size={20} className="text-primary" style={{ flexShrink: 0 }} />
-                            <span className="text-dim" style={{ fontSize: '0.875rem' }}>+91 98765 43210</span>
+                            <span className="text-dim" style={{ fontSize: '0.875rem' }}>+91 8971132109</span>
                         </li>
                         <li className="flex items-center gap-2">
                             <Mail size={20} className="text-primary" style={{ flexShrink: 0 }} />
-                            <span className="text-dim" style={{ fontSize: '0.875rem' }}>support@suraksha.com</span>
+                            <span className="text-dim" style={{ fontSize: '0.875rem' }}>sales.kzcomputers@gmail.com</span>
                         </li>
                     </ul>
                 </div>

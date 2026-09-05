@@ -63,7 +63,8 @@ export default function Navbar() {
                     <img
                         src="/logo/logo horizontal.png"
                         alt="KZ COMPUTERS Logo"
-                        style={{ height: '65px', width: 'auto', objectFit: 'contain' }}
+                        style={{ height: '100px', width: '320px', objectFit: 'fill' }}
+
                     />
                 </Link>
 
