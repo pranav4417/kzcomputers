@@ -108,6 +108,7 @@ model Product {
   featured      Boolean        @default(false) @map("featured")
   displayOrder  Int            @default(0) @map("display_order")
   isActive      Boolean        @default(true) @map("is_active")
+  assetId       String?        @unique @map("asset_id")
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @default(now()) @updatedAt @map("updated_at")
   quoteRequests QuoteRequest[]
@@ -150,9 +151,19 @@ model Service {
 }
 
 model Slider {
-  id        Int      @id @default(autoincrement())
-  image     String
-  createdAt DateTime @default(now()) @map("created_at")
+  id          Int      @id @default(autoincrement())
+  title       String?
+  subtitle    String?
+  description String?
+  image       String
+  link        String?
+  buttonText  String?   @default("Learn More") @map("button_text")
+  displayOrder Int     @default(0) @map("display_order")
+  isActive    Boolean  @default(true) @map("is_active")
+  startDate   DateTime? @map("start_date")
+  endDate     DateTime? @map("end_date")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("sliders")
 }

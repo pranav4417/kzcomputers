@@ -36,7 +36,7 @@ export default function Hero() {
                     className="text-dim title-md mb-8"
                     style={{ maxWidth: '48rem', margin: '0 auto 2rem' }}
                 >
-                    Premium computer services, CCTV solutions, and custom PC building.
+                    Premium computer services, CCTV solutions, AMC, corporate IT solutions, and custom PC building.
                     KZ COMPUTERS delivers excellence in every repair and installation.
                 </motion.p>
 

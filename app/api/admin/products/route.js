@@ -69,6 +69,7 @@ export async function POST(req) {
         const featured = formData.get('featured') === 'true';
         const displayOrder = parseInt(formData.get('displayOrder')) || 0;
         const isActive = formData.get('isActive') !== 'false';
+        const assetId = formData.get('assetId');
         const image = formData.get('image');
 
         let imagePath = null;
@@ -97,7 +98,7 @@ export async function POST(req) {
             await prisma.pendingUpdate.create({
                 data: {
                     entityType: 'Product_Create',
-                    data: JSON.stringify({ name, description, price: parseFloat(price), category, stock, featured, displayOrder, isActive, image: imagePath }),
+                    data: JSON.stringify({ name, description, price: parseFloat(price), category, stock, featured, displayOrder, isActive, assetId, image: imagePath }),
                     submittedBy: session.id,
                     status: 'Pending'
                 }
@@ -106,7 +107,7 @@ export async function POST(req) {
         }
 
         const product = await prisma.product.create({
-            data: { name, description, price: parseFloat(price), category, stock, featured, displayOrder, isActive, image: imagePath }
+            data: { name, description, price: parseFloat(price), category, stock, featured, displayOrder, isActive, assetId, image: imagePath }
         });
 
         return NextResponse.json({ success: true, product });

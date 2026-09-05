@@ -13,7 +13,7 @@ export default function ProductManagement() {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
-    const [formData, setFormData] = useState({ name: '', description: '', price: '', category: 'General', stock: 0, featured: false, displayOrder: 0, isActive: true });
+    const [formData, setFormData] = useState({ name: '', description: '', price: '', category: 'General', stock: 0, featured: false, displayOrder: 0, isActive: true, assetId: '' });
     const [image, setImage] = useState(null);
     const [saving, setSaving] = useState(false);
     const [copied, setCopied] = useState(false);
@@ -202,7 +202,7 @@ export default function ProductManagement() {
                                     <span style={{ fontSize: '0.65rem', color: product.stock > 0 ? '#28a745' : '#dc3545', fontWeight: 700, textTransform: 'uppercase' }}>{product.stock > 0 ? `Stock: ${product.stock}` : 'Out of stock'}</span>
                                 </div>
                                 <div style={{ marginTop: '0.5rem', fontSize: '0.6rem', color: 'var(--text-dim)' }}>
-                                    Display Order: {product.displayOrder} | Status: {product.isActive ? 'Active' : 'Inactive'}
+                                    {product.assetId ? `Asset ID: ${product.assetId}` : 'No Asset ID'} | Display Order: {product.displayOrder} | Status: {product.isActive ? 'Active' : 'Inactive'}
                                 </div>
                             </div>
                         </div>
@@ -234,6 +234,7 @@ export default function ProductManagement() {
                                     <div>
                                         <h3 style={{ fontSize: '1.125rem', fontWeight: 700, margin: 0, color: 'var(--text-main)' }}>{product.name}</h3>
                                         <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>{product.category || 'General'}</span>
+                                        {product.assetId && <span style={{ fontSize: '0.65rem', color: 'var(--primary)', fontWeight: 700, marginLeft: '0.5rem' }}>Asset: {product.assetId}</span>}
                                     </div>
                                     <span style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--primary)', whiteSpace: 'nowrap' }}>₹{Number(product.price).toLocaleString()}</span>
                                 </div>
@@ -268,6 +269,10 @@ export default function ProductManagement() {
                                 <div>
                                     <label style={{ fontSize: '0.625rem', textTransform: 'uppercase', fontWeight: 900, color: 'var(--text-dim)', letterSpacing: '0.1em', marginBottom: '0.5rem', display: 'block' }}>Product Name</label>
                                     <input required className="input-field" style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.75rem', fontSize: '0.875rem' }} value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.625rem', textTransform: 'uppercase', fontWeight: 900, color: 'var(--text-dim)', letterSpacing: '0.1em', marginBottom: '0.5rem', display: 'block' }}>Asset / Catalogue ID</label>
+                                    <input className="input-field" style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.75rem', fontSize: '0.875rem' }} placeholder="e.g. KZ-ASSET-001" value={formData.assetId} onChange={e => setFormData({ ...formData, assetId: e.target.value })} />
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                     <div>

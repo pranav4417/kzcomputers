@@ -113,7 +113,10 @@ export default function ProductsGrid({ initialProducts, maxProducts, showSeeMore
 
                                 <div className="p-6 flex flex-col flex-grow">
                                     <div className="flex justify-between items-start mb-4">
-                                        <h3 className="title-sm m-0">{product.name}</h3>
+                                        <div>
+                                            <h3 className="title-sm m-0">{product.name}</h3>
+                                            {product.assetId && <span style={{ fontSize: '0.65rem', color: 'var(--primary)', fontWeight: 700 }}>Asset: {product.assetId}</span>}
+                                        </div>
                                         <span className="product-price">₹{Number(product.price).toLocaleString()}</span>
                                     </div>
                                     <p className="text-dim line-clamp-2 mb-8" style={{ fontSize: '0.875rem' }}>

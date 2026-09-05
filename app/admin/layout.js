@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-    Shield, LayoutDashboard, Ticket, Package, Hammer, Palette, Users, LogOut, Menu, X, Download, Settings, Clock, AlertTriangle
+    Shield, LayoutDashboard, Ticket, Package, Hammer, Palette, Users, LogOut, Menu, X, Download, Settings, Clock, AlertTriangle, Image
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
@@ -206,6 +206,7 @@ export default function AdminLayout({ children }) {
         { name: 'Tickets', href: '/admin/tickets', icon: Ticket },
         { name: 'Quotes', href: '/admin/quotes', icon: Package },
         { name: 'Products', href: '/admin/products', icon: Package, roleRequirement: ['admin', 'superadmin'] },
+        { name: 'Sliders', href: '/admin/sliders', icon: Image, roleRequirement: ['admin', 'superadmin'] },
         { name: 'Services', href: '/admin/services', icon: Hammer, roleRequirement: ['admin', 'superadmin'] },
         { name: 'Group Service', href: '/admin/group-service', icon: Settings, roleRequirement: ['admin', 'superadmin'] },
         { name: 'Appearance', href: '/admin/appearance', icon: Palette, roleRequirement: ['superadmin'] },
@@ -221,7 +222,7 @@ export default function AdminLayout({ children }) {
     });
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-dark)', color: 'var(--text-main)', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-dark)', color: 'var(--text-main)', overflow: 'visible' }}>
             {/* Sidebar */}
             <AnimatePresence>
                 {isSidebarOpen && (

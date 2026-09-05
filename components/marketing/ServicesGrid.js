@@ -14,6 +14,9 @@ const iconMap = {
     'Building': Cpu,
     'Recovery': Database,
     'Networking': Network,
+    'AMC': Monitor,
+    'Corporate': Cpu,
+    'IT': Network,
 };
 
 export default function ServicesGrid({ services }) {

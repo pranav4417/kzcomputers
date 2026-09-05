@@ -42,6 +42,8 @@ async function main() {
         { name: 'PC Building', description: 'Custom-built desktop PCs with premium components from top brands.', image: null },
         { name: 'Data Recovery', description: 'Safe and secure data recovery from damaged or corrupted storage devices.', image: null },
         { name: 'Networking Setup', description: 'Home and office networking including WiFi, LAN setup, and configuration.', image: null },
+        { name: 'AMC', description: 'Annual maintenance contracts for computers, printers, and IT infrastructure to ensure maximum uptime.', image: null },
+        { name: 'Corporate IT Solutions', description: 'End-to-end corporate IT services including infrastructure setup, support, and managed IT solutions.', image: null },
     ];
 
     for (const service of services) {

@@ -73,6 +73,7 @@ export default function ProductDetailClient({ product }) {
                             <div style={{ display: 'flex', gap: '1rem', marginTop: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
                                 <span style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--primary)' }}>₹{Number(product.price).toLocaleString()}</span>
                                 <span style={{ padding: '0.25rem 0.75rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 700, background: 'rgba(108, 99, 255, 0.1)', color: 'var(--primary)', textTransform: 'uppercase' }}>{product.category || 'General'}</span>
+                                {product.assetId && <span style={{ padding: '0.25rem 0.75rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 700, background: 'rgba(108, 99, 255, 0.1)', color: 'var(--primary)', textTransform: 'uppercase' }}>Asset: {product.assetId}</span>}
                                 <span style={{ padding: '0.25rem 0.75rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 700, background: product.stock > 0 ? 'rgba(40, 167, 69, 0.1)' : 'rgba(220, 53, 69, 0.1)', color: product.stock > 0 ? '#28a745' : '#dc3545', textTransform: 'uppercase' }}>
                                     {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
                                 </span>
