@@ -61,11 +61,10 @@ export default function Navbar() {
                 {/* Logo */}
                 <Link href="/" className="nav-logo">
                     <img
-                        src="/logo/logo horizontal.png"
-                        alt="KZ COMPUTERS Logo"
-                        style={{ height: '100px', width: '320px', objectFit: 'fill' }}
-
-                    />
+    src="/logo/logo horizontal.png"
+    alt="KZ COMPUTERS Logo"
+    style={{ height: '70px', width: 'auto', objectFit: 'contain' }}
+/>
                 </Link>
 
                 {/* Desktop Links */}

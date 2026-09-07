@@ -56,19 +56,6 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Legal Info */}
-        <section className="section-padding container">
-          <div className="glass p-6 text-center" style={{ maxWidth: '48rem', margin: '0 auto', borderColor: 'var(--primary-glow)' }}>
-            <h3 className="title-md mb-3" style={{ color: 'var(--text-primary)' }}>Company Details</h3>
-            <p className="text-dim" style={{ fontSize: '0.875rem', lineHeight: 1.6 }}>
-              <strong style={{ color: 'var(--text-primary)' }}>KZ COMPUTERS</strong><br />
-              NO.483 & 484, Nimishamba, Square Amrutahalli, Amruthahalli, Bangalore, Bangalore North, Karnataka, India, 560092<br />
-              <span style={{ color: '#ffffff', fontWeight: 700 }}>GSTIN: 29AANCK0673R1ZL</span> | 
-              <span style={{ color: '#ffffff', fontWeight: 700 }}> CIN: U62099KA2026PTC224499</span><br />
-              📞 8971132109 | 📧 sales.kzcomputers@gmail.com
-            </p>
-          </div>
-        </section>
       </div>
       <Footer />
     </main>

@@ -9,7 +9,7 @@ export default function SliderManagement() {
     const [loading, setLoading] = useState(true);
     const [expandedId, setExpandedId] = useState(null);
     const [editingSlider, setEditingSlider] = useState(null);
-    const [formData, setFormData] = useState({ title: '', subtitle: '', description: '', link: '', buttonText: 'Learn More', displayOrder: 0, isActive: true, startDate: '', endDate: '' });
+    const [formData, setFormData] = useState({ title: '', subtitle: '', description: '', link: '', buttonText: 'Learn More', displayOrder: 0, isActive: true, startDate: '', endDate: '', transitionType: 'fade' });
     const [image, setImage] = useState(null);
     const [saving, setSaving] = useState(false);
 
@@ -27,14 +27,14 @@ export default function SliderManagement() {
 
     const startCreate = () => {
         setEditingSlider(null);
-        setFormData({ title: '', subtitle: '', description: '', link: '', buttonText: 'Learn More', displayOrder: 0, isActive: true, startDate: '', endDate: '' });
+        setFormData({ title: '', subtitle: '', description: '', link: '', buttonText: 'Learn More', displayOrder: 0, isActive: true, startDate: '', endDate: '', transitionType: 'fade' });
         setImage(null);
         setExpandedId('new');
     };
 
     const startEdit = (slider) => {
         setEditingSlider(slider);
-        setFormData({ title: slider.title || '', subtitle: slider.subtitle || '', description: slider.description || '', link: slider.link || '', buttonText: slider.buttonText || 'Learn More', displayOrder: slider.displayOrder || 0, isActive: slider.isActive !== false, startDate: slider.startDate ? new Date(slider.startDate).toISOString().split('T')[0] : '', endDate: slider.endDate ? new Date(slider.endDate).toISOString().split('T')[0] : '' });
+        setFormData({ title: slider.title || '', subtitle: slider.subtitle || '', description: slider.description || '', link: slider.link || '', buttonText: slider.buttonText || 'Learn More', displayOrder: slider.displayOrder || 0, isActive: slider.isActive !== false, startDate: slider.startDate ? new Date(slider.startDate).toISOString().split('T')[0] : '', endDate: slider.endDate ? new Date(slider.endDate).toISOString().split('T')[0] : '', transitionType: slider.transitionType || 'fade' });
         setImage(null);
         setExpandedId(slider.id);
     };
@@ -42,7 +42,7 @@ export default function SliderManagement() {
     const cancel = () => {
         setExpandedId(null);
         setEditingSlider(null);
-        setFormData({ title: '', subtitle: '', description: '', link: '', buttonText: 'Learn More', displayOrder: 0, isActive: true, startDate: '', endDate: '' });
+        setFormData({ title: '', subtitle: '', description: '', link: '', buttonText: 'Learn More', displayOrder: 0, isActive: true, startDate: '', endDate: '', transitionType: 'fade' });
         setImage(null);
     };
 
@@ -60,6 +60,7 @@ export default function SliderManagement() {
         body.append('isActive', formData.isActive.toString());
         body.append('startDate', formData.startDate);
         body.append('endDate', formData.endDate);
+        body.append('transitionType', formData.transitionType || 'fade');
         if (image) body.append('image', image);
 
         try {
@@ -146,6 +147,18 @@ export default function SliderManagement() {
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', background: 'var(--surface)', borderRadius: '0.75rem', marginTop: '1.35rem' }}>
                                         <input type="checkbox" id="isActive" checked={formData.isActive} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} style={{ width: '1.25rem', height: '1.25rem', accentColor: 'var(--primary)' }} />
                                         <label htmlFor="isActive" style={{ fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>Active</label>
+                                    </div>
+                                    <div style={{ marginTop: '1.35rem' }}>
+                                        <label style={{ fontSize: '0.625rem', textTransform: 'uppercase', fontWeight: 900, color: 'var(--text-dim)', letterSpacing: '0.1em', marginBottom: '0.5rem', display: 'block' }}>Transition Effect</label>
+                                        <select className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'var(--surface)', borderRadius: '0.75rem', fontSize: '0.875rem' }} value={formData.transitionType} onChange={e => setFormData({ ...formData, transitionType: e.target.value })}>
+                                            <option value="fade">Fade</option>
+                                            <option value="slide-left">Slide Left</option>
+                                            <option value="slide-right">Slide Right</option>
+                                            <option value="slide-up">Slide Up</option>
+                                            <option value="slide-down">Slide Down</option>
+                                            <option value="zoom">Zoom</option>
+                                            <option value="flip">Flip</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -235,10 +248,22 @@ export default function SliderManagement() {
                                             </div>
                                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                                 <input type="number" className="input-field" style={{ padding: '0.75rem', background: 'var(--surface)', borderRadius: '0.75rem', fontSize: '0.875rem' }} value={formData.displayOrder} onChange={e => setFormData({ ...formData, displayOrder: parseInt(e.target.value) || 0 })} />
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', background: 'var(--surface)', borderRadius: '0.75rem' }}>
-                                                    <input type="checkbox" id="isActive" checked={formData.isActive} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} style={{ width: '1.25rem', height: '1.25rem', accentColor: 'var(--primary)' }} />
-                                                    <label htmlFor="isActive" style={{ fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>Active</label>
-                                                </div>
+                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', background: 'var(--surface)', borderRadius: '0.75rem' }}>
+                                                     <input type="checkbox" id="isActive" checked={formData.isActive} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} style={{ width: '1.25rem', height: '1.25rem', accentColor: 'var(--primary)' }} />
+                                                     <label htmlFor="isActive" style={{ fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>Active</label>
+                                                 </div>
+                                                 <div>
+                                                     <label style={{ fontSize: '0.625rem', textTransform: 'uppercase', fontWeight: 900, color: 'var(--text-dim)', letterSpacing: '0.1em', marginBottom: '0.5rem', display: 'block' }}>Transition Effect</label>
+                                                     <select className="input-field" style={{ width: '100%', padding: '0.75rem', background: 'var(--surface)', borderRadius: '0.75rem', fontSize: '0.875rem' }} value={formData.transitionType} onChange={e => setFormData({ ...formData, transitionType: e.target.value })}>
+                                                         <option value="fade">Fade</option>
+                                                         <option value="slide-left">Slide Left</option>
+                                                         <option value="slide-right">Slide Right</option>
+                                                         <option value="slide-up">Slide Up</option>
+                                                         <option value="slide-down">Slide Down</option>
+                                                         <option value="zoom">Zoom</option>
+                                                         <option value="flip">Flip</option>
+                                                     </select>
+                                                 </div>
                                             </div>
                                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                                 <input type="date" className="input-field" style={{ padding: '0.75rem', background: 'var(--surface)', borderRadius: '0.75rem', fontSize: '0.875rem' }} value={formData.startDate} onChange={e => setFormData({ ...formData, startDate: e.target.value })} />

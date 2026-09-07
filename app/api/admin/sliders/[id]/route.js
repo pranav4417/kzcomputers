@@ -43,6 +43,7 @@ export async function PATCH(req, { params }) {
         const isActive = formData.get('isActive');
         const startDate = formData.get('startDate');
         const endDate = formData.get('endDate');
+        const transitionType = formData.get('transitionType');
         const image = formData.get('image');
 
         const updateData = {};
@@ -55,24 +56,20 @@ export async function PATCH(req, { params }) {
         if (isActive !== null) updateData.isActive = isActive === 'true';
         if (startDate !== null) updateData.startDate = startDate ? new Date(startDate) : null;
         if (endDate !== null) updateData.endDate = endDate ? new Date(endDate) : null;
+        if (transitionType !== null) updateData.transitionType = transitionType;
 
         if (image && typeof image !== 'string') {
             const bytes = await image.arrayBuffer();
             const buffer = Buffer.from(bytes);
             const fileName = `${Date.now()}-${image.name}`;
 
-            const uploadResult = await new Promise((resolve, reject) => {
-                cloudinary.uploader.upload_stream(
-                    {
-                        public_id: `sliders/${fileName.replace(/\.[^/.]+$/, '')}`,
-                        folder: 'suraksha/sliders'
-                    },
-                    (error, result) => {
-                        if (error) reject(error);
-                        else resolve(result);
-                    }
-                ).end(buffer);
-            });
+            const uploadResult = await cloudinary.uploader.upload(
+                `data:${image.type};base64,${buffer.toString('base64')}`,
+                {
+                    public_id: `sliders/${fileName.replace(/\.[^/.]+$/, '')}`,
+                    folder: 'suraksha/sliders'
+                }
+            );
 
             updateData.image = uploadResult.secure_url;
         }

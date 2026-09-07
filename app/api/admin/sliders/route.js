@@ -47,6 +47,7 @@ export async function POST(req) {
         const isActive = formData.get('isActive') !== 'false';
         const startDate = formData.get('startDate');
         const endDate = formData.get('endDate');
+        const transitionType = formData.get('transitionType') || 'fade';
         const image = formData.get('image');
 
         let imagePath = null;
@@ -55,18 +56,13 @@ export async function POST(req) {
             const buffer = Buffer.from(bytes);
             const fileName = `${Date.now()}-${image.name}`;
 
-            const uploadResult = await new Promise((resolve, reject) => {
-                cloudinary.uploader.upload_stream(
-                    {
-                        public_id: `sliders/${fileName.replace(/\.[^/.]+$/, '')}`,
-                        folder: 'suraksha/sliders'
-                    },
-                    (error, result) => {
-                        if (error) reject(error);
-                        else resolve(result);
-                    }
-                ).end(buffer);
-            });
+            const uploadResult = await cloudinary.uploader.upload(
+                `data:${image.type};base64,${buffer.toString('base64')}`,
+                {
+                    public_id: `sliders/${fileName.replace(/\.[^/.]+$/, '')}`,
+                    folder: 'suraksha/sliders'
+                }
+            );
 
             imagePath = uploadResult.secure_url;
         }
@@ -83,6 +79,7 @@ export async function POST(req) {
                 isActive,
                 startDate: startDate ? new Date(startDate) : null,
                 endDate: endDate ? new Date(endDate) : null,
+                transitionType,
             }
         });
 
