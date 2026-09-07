@@ -30,10 +30,10 @@ export default function HomepageSlider({ sliders = [] }) {
     const slider = sliders[current];
 
     return (
-        <div style={{ position: 'relative', width: '100%', height: '70vh', minHeight: '500px', maxHeight: '800px', overflow: 'hidden', background: '#000' }}>
-            <Image src={slider.image} alt={slider.title || 'Slider'} fill style={{ objectFit: 'cover' }} priority={current === 0} />
+        <div style={{ position: 'relative', width: '100%', height: '70vh', minHeight: '500px', maxHeight: '800px', overflow: 'hidden', background: '#000', marginTop: '100px' }}>
+            <Image src={slider.image} alt={slider.title || 'Slider'} fill style={{ objectFit: 'contain', background: '#000' }} priority={current === 0} />
 
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', padding: '0 5%' }}>
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', padding: '6rem 5% 2rem' }}>
                 <div style={{ maxWidth: '700px', textAlign: 'left' }}>
                     {slider.title && <h1 style={{ fontSize: 'clamp(2rem, 5vw, 4rem)', fontWeight: 900, color: '#fff', margin: 0, lineHeight: 1.1, textShadow: '0 2px 20px rgba(0,0,0,0.5)' }}>{slider.title}</h1>}
                     {slider.subtitle && <h2 style={{ fontSize: 'clamp(1.25rem, 2.5vw, 2rem)', fontWeight: 700, color: 'var(--primary)', margin: '0.5rem 0 1rem', textShadow: '0 1px 10px rgba(0,0,0,0.5)' }}>{slider.subtitle}</h2>}
