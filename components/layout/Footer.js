@@ -4,7 +4,7 @@ import { Shield, Mail, Phone, MapPin, Facebook, Instagram, Twitter } from 'lucid
 
 export default function Footer() {
     return (
-        <footer style={{ paddingTop: '5rem', paddingBottom: '2.5rem', borderTop: '1px solid var(--border-glass)', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(24px)' }}>
+        <footer style={{ paddingTop: '5rem', paddingBottom: '2.5rem', borderTop: '1px solid var(--border-glass)', background: 'var(--bg-dark)', backdropFilter: 'blur(24px)' }}>
             <div className="container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
                 {/* Brand */}
                 <div>
@@ -30,7 +30,7 @@ export default function Footer() {
 
                 {/* Services */}
                 <div>
-                    <h4 className="title-sm" style={{ color: '#fff', marginBottom: '1.5rem' }}>Services</h4>
+                    <h4 className="title-sm" style={{ color: 'var(--primary)', marginBottom: '1.5rem', fontWeight: 800 }}>Services</h4>
                     <ul className="flex flex-col gap-4">
                         <li><Link href="/#services" className="text-dim hover:text-white" style={{ transition: 'color 0.3s' }}>Hardware Peripherals</Link></li>
                         <li><Link href="/#services" className="text-dim hover:text-white" style={{ transition: 'color 0.3s' }}>Software Products</Link></li>
@@ -44,7 +44,7 @@ export default function Footer() {
 
                 {/* Quick Links */}
                 <div>
-                    <h4 className="title-sm" style={{ color: '#fff', marginBottom: '1.5rem' }}>Quick Links</h4>
+                    <h4 className="title-sm" style={{ color: 'var(--primary)', marginBottom: '1.5rem', fontWeight: 800 }}>Quick Links</h4>
                     <ul className="flex flex-col gap-4">
                         <li><Link href="/#services" className="text-dim hover:text-white" style={{ transition: 'color 0.3s' }}>Our Services</Link></li>
                         <li><Link href="/#products" className="text-dim hover:text-white" style={{ transition: 'color 0.3s' }}>Product Store</Link></li>
@@ -54,7 +54,7 @@ export default function Footer() {
                     </ul>
                 </div>
                 <div>
-                    <h4 className="title-sm" style={{ color: '#fff', marginBottom: '1.5rem' }}>Get in Touch</h4>
+                    <h4 className="title-sm" style={{ color: 'var(--primary)', marginBottom: '1.5rem', fontWeight: 800 }}>Get in Touch</h4>
                     <ul className="flex flex-col gap-4">
                         <li className="flex items-start gap-2">
                             <MapPin size={20} className="text-primary" style={{ flexShrink: 0 }} />
@@ -72,7 +72,7 @@ export default function Footer() {
                 </div>
             </div>
 
-            <div className="container pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+            <div className="container pt-8" style={{ borderTop: '1px solid var(--border-glass)', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
                 <p className="text-dim" style={{ fontSize: '0.75rem' }}>&copy; 2026 KZ COMPUTERS. All rights reserved.</p>
             </div>
         </footer>

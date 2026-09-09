@@ -8,7 +8,6 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
-import ThemeToggle from '@/components/ThemeToggle';
 
 // Session timeout constants (in milliseconds)
 const INACTIVITY_WARNING_DELAY = 60 * 1000; // 1 minute of inactivity before showing warning
@@ -292,7 +291,6 @@ export default function AdminLayout({ children }) {
                         >
                             {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
                         </button>
-                        <ThemeToggle />
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>

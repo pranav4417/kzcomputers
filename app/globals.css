@@ -244,6 +244,12 @@ button {
   box-shadow: 0 12px 40px var(--shadow);
 }
 
+/* Footer light mode enhancements */
+[data-theme="light"] footer {
+  border-top: 1px solid rgba(0, 59, 115, 0.15) !important;
+  box-shadow: 0 -4px 30px rgba(0, 59, 115, 0.08);
+}
+
 /* Light-mode readability fixes for common inline surfaces */
 [data-theme="light"] .glass,
 [data-theme="light"] [style*="background: rgba(255, 255, 255, 0.05)"],

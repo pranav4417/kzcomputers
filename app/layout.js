@@ -2,6 +2,7 @@ import './globals.css';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import ThemeToggle from '@/components/ThemeToggle';
+import CustomCursor from '@/components/CustomCursor';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,6 +19,7 @@ export default function RootLayout({ children }) {
           <div className="main-container">
             {children}
           </div>
+          <CustomCursor />
           <div style={{
             position: 'fixed',
             bottom: '1.5rem',

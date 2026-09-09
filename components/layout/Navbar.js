@@ -2,15 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, Shield, Monitor, Ticket, Hammer, Settings, LogIn, Sun, Moon, LogOut, User } from 'lucide-react';
+import { Menu, X, Shield, Monitor, Ticket, Hammer, Settings, LogIn, LogOut, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from '../ThemeProvider';
 
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-    const { theme, toggleTheme } = useTheme();
     const [user, setUser] = useState(null);
 
     useEffect(() => {
@@ -76,9 +74,6 @@ export default function Navbar() {
                             </Link>
                         ))}
                     </div>
-                    <button onClick={toggleTheme} aria-label="Toggle Theme" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-                    </button>
                     {user ? (
                         <div className="relative">
                             {/* Profile Dropdown Trigger */}
